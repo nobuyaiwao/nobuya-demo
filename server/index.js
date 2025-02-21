@@ -5,15 +5,14 @@ const path = require("path");
 const fs = require("fs");
 const https = require("https");
 
-// Import API routes
 const paymentRoutes = require("./routes/payments");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors()); // Enable CORS
-app.use(express.json()); // Parse JSON requests
+app.use(cors());
+app.use(express.json());
 
 // Serve static files (CSS, JS, and HTML)
 app.use(express.static(path.join(__dirname, "../src"), { extensions: ["html", "js", "css"] }));
@@ -45,7 +44,7 @@ if (process.env.NODE_ENV === "test") {
         });
     }
 } else {
-    // Run normal HTTP server (for Heroku)
+    // Heroku should not use HTTPS manually
     app.listen(PORT, () => {
         console.log(`Server is running on http://localhost:${PORT}`);
     });
