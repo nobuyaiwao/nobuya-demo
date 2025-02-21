@@ -26,18 +26,23 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../src/index.html"));
 });
 
-// Use HTTPS locally if NODE_ENV is "test"
 if (process.env.NODE_ENV === "test") {
     try {
+        const certPath = path.join(__dirname, "certs");
         const options = {
-            key: fs.readFileSync("server.key"),
-            cert: fs.readFileSync("server.crt"),
+            key: fs.readFileSync(path.join(certPath, "server.key")),
+            cert: fs.readFileSync(path.join(certPath, "server.crt")),
         };
+
         https.createServer(options, app).listen(PORT, () => {
             console.log(`HTTPS Server is running on https://localhost:${PORT}`);
         });
     } catch (error) {
         console.error("Failed to start HTTPS server:", error);
+        console.log("Falling back to HTTP mode.");
+        app.listen(PORT, () => {
+            console.log(`Server is running on http://localhost:${PORT}`);
+        });
     }
 } else {
     // Run normal HTTP server (for Heroku)
