@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
+const https = require("https");
 
 // Import API routes
 const paymentRoutes = require("./routes/payments");
@@ -17,15 +19,30 @@ app.use(express.json()); // Parse JSON requests
 app.use(express.static(path.join(__dirname, "../src"), { extensions: ["html", "js", "css"] }));
 
 // API routes
-app.use("/api", paymentRoutes); // All payment-related endpoints start with "/api"
+app.use("/api", paymentRoutes);
 
 // Root route - Serve the main index.html
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../src/index.html"));
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Use HTTPS locally if NODE_ENV is "test"
+if (process.env.NODE_ENV === "test") {
+    try {
+        const options = {
+            key: fs.readFileSync("server.key"),
+            cert: fs.readFileSync("server.crt"),
+        };
+        https.createServer(options, app).listen(PORT, () => {
+            console.log(`HTTPS Server is running on https://localhost:${PORT}`);
+        });
+    } catch (error) {
+        console.error("Failed to start HTTPS server:", error);
+    }
+} else {
+    // Run normal HTTP server (for Heroku)
+    app.listen(PORT, () => {
+        console.log(`Server is running on http://localhost:${PORT}`);
+    });
+}
 
