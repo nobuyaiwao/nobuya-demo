@@ -2,8 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const fs = require("fs");
-const https = require("https");
 
 const paymentRoutes = require("./routes/payments");
 
@@ -25,11 +23,8 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../src/index.html"));
 });
 
-// Determine the environment and start the appropriate server
-if (process.env.ON_HEROKU === "true") {
-    // 🔹 Running on Heroku (Heroku automatically handles HTTPS, so we use HTTP)
-    app.listen(PORT, () => {
-        console.log(`Running on Heroku → Server is running on http://localhost:${PORT}`);
-    });
-}
+// Start HTTP server (works for both local and Heroku)
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
 
