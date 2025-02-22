@@ -1,18 +1,10 @@
 // 🔹 Fetch payment methods from the backend
 export const fetchPaymentMethods = async (options) => {
     try {
-        const payload = {
-            countryCode: options.countryCode || "US",
-            amount: {
-                currency: options.currency || "USD",
-                value: options.amount || 1000
-            }
-        };
-
-        const response = await fetch("/api/paymentMethods", { 
+        const response = await fetch("/api/paymentMethods", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(options)  // ✅ Directly use options
         });
 
         if (!response.ok) {
@@ -47,22 +39,167 @@ export const getClientConfig = async () => {
     }
 };
 
-// 🔹 Process payment (this will be implemented later)
+// 🔹 Process the payment request and log API calls
 export const makePayment = async (paymentData) => {
     console.log("Processing payment:", paymentData);
-    // TODO: Implement API call to /api/payments
-    return { resultCode: "Authorised", action: null };
+
+    try {
+        // 🔹 Log the request before sending
+        updatePaymentsLog("[/payments] Request", paymentData);
+
+        const response = await fetch("/api/payments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(paymentData),
+        });
+
+        const responseData = await response.json();
+        console.log("Payment response:", responseData);
+
+        // 🔹 Log the response after receiving
+        updatePaymentsLog("[/payments] Response", responseData);
+
+        return responseData;
+
+    } catch (error) {
+        console.error("Error processing payment:", error);
+
+        // 🔹 Log the error
+        updatePaymentsLog("[/payments] Error", { error: error.message });
+
+        return { error: "Payment failed" };
+    }
 };
 
-// 🔹 Handle additional payment details (3DS, etc.)
-export const handleAdditionalDetails = async (details) => {
-    console.log("Handling additional details:", details);
-    // TODO: Implement API call to /api/paymentDetails
-    return { resultCode: "Authorised" };
+// 🔹 Process additional payment details (3DS, etc.) and log API calls
+export const makeDetails = async (detailsData) => {
+    console.log("Processing additional details:", detailsData);
+
+    try {
+        // 🔹 Log the request before sending
+        updatePaymentsLog("[/payments/details] Request", detailsData);
+
+        const response = await fetch("/api/payments/details", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(detailsData),
+        });
+
+        const responseData = await response.json();
+        console.log("Details response:", responseData);
+
+        // 🔹 Log the response after receiving
+        updatePaymentsLog("[/payments/details] Response", responseData);
+        return responseData;
+    } catch (error) {
+        console.error("Error processing additional details:", error);
+        updatePaymentsLog("[/payments/details] Error", { error: error.message });
+        return { error: "Details processing failed" };
+    }
 };
 
-// 🔹 Update UI state container (for debugging/demo purposes)
+// 🔹 Update the state container (debug console)
 export const updateStateContainer = (state) => {
-    console.log("Updating state container:", state);
+    const stateContainer = document.getElementById("state-container");
+    if (stateContainer) {
+        stateContainer.textContent = JSON.stringify(state, null, 2);
+    }
 };
 
+// 🔹 Update the payments log in the debug console
+export const updatePaymentsLog = (type, data) => {
+    const paymentsContainer = document.getElementById("payments-container");
+    if (!paymentsContainer) return;
+
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = `[${timestamp}] ${type}:\n${JSON.stringify(data, null, 2)}\n\n`;
+
+    paymentsContainer.textContent = logEntry + paymentsContainer.textContent;
+};
+
+
+
+//// 🔹 Process the payment request
+//export const makePayment = async (paymentData) => {
+//    console.log("Processing payment:", paymentData);
+//
+//    try {
+//        // 🔹 Log the request before sending
+//        updatePaymentsLog("Payment Request", paymentData);
+//
+//        const response = await fetch("/api/payments", {
+//            method: "POST",
+//            headers: { "Content-Type": "application/json" },
+//            body: JSON.stringify(paymentData),
+//        });
+//
+//        const responseData = await response.json();
+//        console.log("Payment response:", responseData);
+//
+//        // 🔹 Log the response after receiving
+//        updatePaymentsLog("Payment Response", responseData);
+//
+//        return responseData;
+//
+//    } catch (error) {
+//        console.error("Error processing payment:", error);
+//
+//        // 🔹 Log the error
+//        updatePaymentsLog("Payment Error", { error: error.message });
+//
+//        return { error: "Payment failed" };
+//    }
+//};
+//
+////// 🔹 Handle additional payment details (3DS, etc.)
+////export const handleAdditionalDetails = async (details) => {
+////    console.log("Handling additional details:", details);
+////    // TODO: Implement API call to /api/paymentDetails
+////    return { resultCode: "Authorised" };
+////};
+//
+//// 
+//export const makeDetails = async (detailsData) => {
+//    console.log("Processing additional details:", detailsData);
+//
+//    try {
+//        updatePaymentsLog("Details Request", detailsData);
+//
+//        const response = await fetch("/api/payments/details", {
+//            method: "POST",
+//            headers: { "Content-Type": "application/json" },
+//            body: JSON.stringify(detailsData),
+//        });
+//
+//        const responseData = await response.json();
+//        console.log("Details response:", responseData);
+//
+//        updatePaymentsLog("Details Response", responseData);
+//        return responseData;
+//    } catch (error) {
+//        console.error("Error processing additional details:", error);
+//        updatePaymentsLog("Details Error", { error: error.message });
+//        return { error: "Details processing failed" };
+//    }
+//};
+//
+//
+//// 🔹 Update the state container (debug console)
+//export const updateStateContainer = (state) => {
+//    const stateContainer = document.getElementById("state-container");
+//    if (stateContainer) {
+//        stateContainer.textContent = JSON.stringify(state, null, 2);
+//    }
+//};
+//
+//// 🔹 Update the payments log in the debug console
+//export const updatePaymentsLog = (type, data) => {
+//    const paymentsContainer = document.getElementById("payments-container");
+//    if (!paymentsContainer) return;
+//
+//    const timestamp = new Date().toLocaleTimeString();
+//    const logEntry = `[${timestamp}] ${type}:\n${JSON.stringify(data, null, 2)}\n\n`;
+//
+//    paymentsContainer.textContent = logEntry + paymentsContainer.textContent;
+//};
+//

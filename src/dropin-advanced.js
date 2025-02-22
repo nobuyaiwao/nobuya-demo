@@ -1,64 +1,233 @@
-import { getClientConfig, fetchPaymentMethods, makePayment, handleAdditionalDetails, updateStateContainer } from "./util.js";
+import { getClientConfig, fetchPaymentMethods, makePayment, makeDetails, updateStateContainer, updatePaymentsLog } from "./util.js";
 
+// 🔹 Handle test card copying
 document.addEventListener("DOMContentLoaded", () => {
-    // 0. Get clientKey
-    getClientConfig().then(config => {
-        if (!config) throw new Error("Failed to load client config");
+    document.querySelectorAll(".copy-btn").forEach(button => {
+        button.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const cardNumber = button.parentElement.dataset.card;
+            navigator.clipboard.writeText(cardNumber).then(() => {
+                console.log(`Copied card number: ${cardNumber}`);
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => button.innerHTML = '<i class="fas fa-copy"></i> Copy', 1500);
+            }).catch(err => console.error("Failed to copy card number:", err));
+        });
+    });
+});
 
-        console.log("Client config received:", config);
+// 🔹 Generate a merchant reference
+const generateReference = () => {
+    const now = new Date();
+    return `nobuya-demo-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-` +
+           `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+};
+
+// 🔹 Generate return URL based on reference
+const generateReturnUrl = (reference) => {
+    const host = window.location.origin;
+    return `${host}/returnurl.html?reference=${reference}`;
+};
+
+//// 🔹 Handle payments API call and update logs
+//const handlePayment = async (paymentsReqData, actions) => {
+//    try {
+//        updatePaymentsLog("Request", paymentsReqData);
+//        const { action, resultCode } = await makePayment(paymentsReqData);
+//        updatePaymentsLog("Response", { resultCode, action });
+//
+//        if (action) {
+//            console.log("Handling action:", action);
+//            actions.resolve(action);
+//        } else if (resultCode === "Authorised") {
+//            console.log("Payment authorised!");
+//        } else {
+//            console.error("Payment failed:", resultCode);
+//            actions.reject();
+//        }
+//
+//    } catch (error) {
+//        console.error("Payment submission error:", error);
+//        updatePaymentsLog("Error", error.message);
+//        actions.reject();
+//    }
+//};
+
+// 🔹 Handle additional details and call /payments/details
+//const handleDetails = async (details, actions) => {
+//    try {
+//        updatePaymentsLog("Details Request", details);
+//        const response = await handleAdditionalDetails(details);
+//        updatePaymentsLog("Details Response", response);
+//
+//        if (response.action) {
+//            console.log("Handling additional action:", response.action);
+//            actions.resolve(response.action);
+//        } else {
+//            console.log("Final result:", response.resultCode);
+//        }
+//
+//    } catch (error) {
+//        console.error("Error handling additional details:", error);
+//        updatePaymentsLog("Details Error", error.message);
+//    }
+//};
+
+// 🔹 Set reference and return URL when the page loads
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM fully loaded and parsed.");
+    
+    const referenceField = document.getElementById("reference");
+    const returnUrlField = document.getElementById("returnUrl");
+
+    if (referenceField && returnUrlField) {
+        const reference = generateReference();
+        referenceField.value = reference;
+        returnUrlField.placeholder = generateReturnUrl(reference);
+    }
+
+    const startPaymentButton = document.getElementById("start-payment");
+    if (!startPaymentButton) {
+        console.error("Start payment button not found!");
+        return;
+    }
+
+    startPaymentButton.addEventListener("click", async () => {
+        console.log("Here we go! button clicked.");
+
+        document.querySelector(".input-container").style.display = "none";
+        startPaymentButton.style.display = "none";
+
+        const countryCode = document.getElementById("countryCode")?.value || "JP";
+        const currency = document.getElementById("currency")?.value || "JPY";
+        const value = parseInt(document.getElementById("amount")?.value || "5000", 10);
+        const reference = document.getElementById("reference")?.value;
+        const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
+        const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
+        const origin = window.location.origin;
+
+        if (isNaN(value) || value <= 0) {
+            console.error("Invalid amount value. Please enter a valid number.");
+            return;
+        }
 
         const pmReqConfig = {
-            countryCode: "JP"
+            countryCode,
+            amount: { currency, value }
         };
 
-        // 1. Get available payment methods
-        fetchPaymentMethods(pmReqConfig).then(async paymentMethodsResponse => {
-            if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
+        console.log("Payment request configuration:", pmReqConfig);
 
-            console.log("Payment methods received:", paymentMethodsResponse);
-            // paymentMethodsResponse.paymentMethods.reverse(); // Uncomment if needed
+        try {
+            const config = await getClientConfig();
+            if (!config) throw new Error("Failed to load client config");
+
+            const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
+            if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
                 locale: "ja-JP",
                 environment: config.environment,
-                countryCode: "JP",
-                onChange: state => {
-                    updateStateContainer(state); // Demo purposes only
-                },
+                countryCode,
+                onChange: updateStateContainer,
+                //onSubmit: async (state, component, actions) => {
+                //    console.log("### drop-in::onSubmit:: calling");
+                //    const paymentsReqData = {
+                //        ...state.data,
+                //        reference,
+                //        amount: { currency, value },
+                //        returnUrl,
+                //        origin,
+                //        channel: "Web",
+                //        ...(nativeThreeDS && {
+                //            authenticationData: {
+                //                threeDSRequestData: {
+                //                    nativeThreeDS
+                //                }
+                //            }
+                //        })
+                //    };
+                //    await handlePayment(paymentsReqData, actions);
+                //},
                 onSubmit: async (state, component, actions) => {
-                    console.log('### drop-in::onSubmit:: calling');
+                    console.log('### card::onSubmit:: calling');
+                
                     try {
-                        const { action, resultCode } = await makePayment(state.data);
-                        if (!resultCode) actions.reject();
+                        // 🔹 Hide state.data display after submission
+                        document.getElementById("state-container").style.display = "none";
 
-                        actions.resolve({
-                            resultCode,
-                            action
-                        });
+                        // 🔹 Call makePayment(), which already logs the request & response
+                        const paymentsReqData = {
+                            ...state.data,
+                            reference,
+                            amount: { currency, value },
+                            returnUrl,
+                            origin,
+                            channel: "Web",
+                            ...(nativeThreeDS && {
+                                authenticationData: {
+                                    threeDSRequestData: {
+                                        nativeThreeDS
+                                    }
+                                }
+                            })
+                        };
 
+                        const { action, resultCode } = await makePayment(paymentsReqData);
+                
+                        if (!resultCode) {
+                            console.error("Payment failed, missing resultCode.");
+                            actions.reject();
+                            return;
+                        }
+                
+                        console.log("Handling action:", action);
+                        actions.resolve({ resultCode, action });
+                
                     } catch (error) {
-                        console.error("Payment submission error:", error);
+                        console.error("Payment error:", error);
                         actions.reject();
                     }
                 },
-                onAdditionalDetails: (details) => {
-                    console.log('### drop-in::onAdditionalDetails:: calling');
-                    handleAdditionalDetails(details).then(response => {
-                        console.log('### drop-in::onAdditionalDetails:: response', response);
-                    });
+                onAdditionalDetails: async (state, component, actions) => {
+                    console.log("### card::onAdditionalDetails:: calling");
+                
+                    try {
+                        // 🔹 Call makeDetails(), which already logs the request & response
+                        const result = await makeDetails(state.data);
+                
+                        if (!result.resultCode) {
+                            console.error("Additional details processing failed: Missing resultCode.");
+                            actions.reject();
+                            return;
+                        }
+                
+                        const { resultCode, action, order, donationToken } = result;
+                
+                        console.log("Handling additional details:", { resultCode, action, order, donationToken });
+                
+                        actions.resolve({
+                            resultCode,
+                            action,
+                            order,
+                            donationToken,
+                        });
+                
+                    } catch (error) {
+                        console.error("Additional details processing error:", error);
+                        actions.reject();
+                    }
                 }
             };
 
-            // 2. Create an instance of AdyenCheckout
             const { AdyenCheckout, Dropin } = window.AdyenWeb;
             const checkout = await AdyenCheckout(configObj);
-
-            // 3. Mount Drop-in
             new Dropin(checkout).mount("#dropin-container");
-            console.log("Drop-in component mounted.");
-        }).catch(error => console.error("Error fetching payment methods:", error));
-    }).catch(error => console.error("Error fetching client config:", error));
+
+        } catch (error) {
+            console.error("Error during initialization:", error);
+        }
+    });
 });
 
