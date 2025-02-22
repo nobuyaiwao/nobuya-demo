@@ -1,43 +1,64 @@
-document.getElementById("start-payment").addEventListener("click", async () => {
-    try {
-        console.log("Fetching available payment methods...");
+import { getClientConfig, fetchPaymentMethods, makePayment, handleAdditionalDetails, updateStateContainer } from "./util.js";
 
-        // Call backend to get available payment methods
-        const response = await fetch("/api/paymentMethods", { 
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ countryCode: "US", amount: { currency: "USD", value: 1000 } })
-        });
+document.addEventListener("DOMContentLoaded", () => {
+    // 0. Get clientKey
+    getClientConfig().then(config => {
+        if (!config) throw new Error("Failed to load client config");
 
-        if (!response.ok) {
-            throw new Error(`Failed to fetch payment methods: ${response.statusText}`);
-        }
+        console.log("Client config received:", config);
 
-        const paymentMethods = await response.json();
-        console.log("Payment methods received:", paymentMethods);
-
-        // Configure Adyen Checkout
-        const configuration = {
-            locale: "en_US",
-            environment: "test", // Change to "live" in production
-            clientKey: "your_adyen_client_key", // Replace with actual Client Key
-            paymentMethodsResponse: paymentMethods,
-            onSubmit: (state, dropin) => {
-                console.log("Payment submitted:", state);
-                // TODO: Call /api/payments to process the payment
-            },
-            onError: (error) => {
-                console.error("Error:", error);
-            }
+        const pmReqConfig = {
+            countryCode: "JP"
         };
 
-        // Mount Drop-in UI
-        const checkout = new AdyenCheckout(configuration);
-        checkout.create("dropin").mount("#dropin-container");
-        console.log("Drop-in component mounted.");
+        // 1. Get available payment methods
+        fetchPaymentMethods(pmReqConfig).then(async paymentMethodsResponse => {
+            if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
-    } catch (error) {
-        console.error("Failed to load payment methods:", error);
-    }
+            console.log("Payment methods received:", paymentMethodsResponse);
+            // paymentMethodsResponse.paymentMethods.reverse(); // Uncomment if needed
+
+            const configObj = {
+                paymentMethodsResponse,
+                clientKey: config.clientKey,
+                locale: "ja-JP",
+                environment: config.environment,
+                countryCode: "JP",
+                onChange: state => {
+                    updateStateContainer(state); // Demo purposes only
+                },
+                onSubmit: async (state, component, actions) => {
+                    console.log('### drop-in::onSubmit:: calling');
+                    try {
+                        const { action, resultCode } = await makePayment(state.data);
+                        if (!resultCode) actions.reject();
+
+                        actions.resolve({
+                            resultCode,
+                            action
+                        });
+
+                    } catch (error) {
+                        console.error("Payment submission error:", error);
+                        actions.reject();
+                    }
+                },
+                onAdditionalDetails: (details) => {
+                    console.log('### drop-in::onAdditionalDetails:: calling');
+                    handleAdditionalDetails(details).then(response => {
+                        console.log('### drop-in::onAdditionalDetails:: response', response);
+                    });
+                }
+            };
+
+            // 2. Create an instance of AdyenCheckout
+            const { AdyenCheckout, Dropin } = window.AdyenWeb;
+            const checkout = await AdyenCheckout(configObj);
+
+            // 3. Mount Drop-in
+            new Dropin(checkout).mount("#dropin-container");
+            console.log("Drop-in component mounted.");
+        }).catch(error => console.error("Error fetching payment methods:", error));
+    }).catch(error => console.error("Error fetching client config:", error));
 });
 

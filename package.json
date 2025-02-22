@@ -8,6 +8,7 @@
     "dev": "nodemon server/index.js"
   },
   "dependencies": {
+    "@adyen/adyen-web": "^6.8.0",
     "axios": "^1.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
@@ -20,4 +21,3 @@
     "node": ">=16.0.0"
   }
 }
-
