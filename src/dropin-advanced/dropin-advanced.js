@@ -28,51 +28,6 @@ const generateReturnUrl = (reference) => {
     return `${host}/returnurl.html?reference=${reference}`;
 };
 
-//// 🔹 Handle payments API call and update logs
-//const handlePayment = async (paymentsReqData, actions) => {
-//    try {
-//        updatePaymentsLog("Request", paymentsReqData);
-//        const { action, resultCode } = await makePayment(paymentsReqData);
-//        updatePaymentsLog("Response", { resultCode, action });
-//
-//        if (action) {
-//            console.log("Handling action:", action);
-//            actions.resolve(action);
-//        } else if (resultCode === "Authorised") {
-//            console.log("Payment authorised!");
-//        } else {
-//            console.error("Payment failed:", resultCode);
-//            actions.reject();
-//        }
-//
-//    } catch (error) {
-//        console.error("Payment submission error:", error);
-//        updatePaymentsLog("Error", error.message);
-//        actions.reject();
-//    }
-//};
-
-// 🔹 Handle additional details and call /payments/details
-//const handleDetails = async (details, actions) => {
-//    try {
-//        updatePaymentsLog("Details Request", details);
-//        const response = await handleAdditionalDetails(details);
-//        updatePaymentsLog("Details Response", response);
-//
-//        if (response.action) {
-//            console.log("Handling additional action:", response.action);
-//            actions.resolve(response.action);
-//        } else {
-//            console.log("Final result:", response.resultCode);
-//        }
-//
-//    } catch (error) {
-//        console.error("Error handling additional details:", error);
-//        updatePaymentsLog("Details Error", error.message);
-//    }
-//};
-
-// 🔹 Set reference and return URL when the page loads
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM fully loaded and parsed.");
     
@@ -131,25 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 environment: config.environment,
                 countryCode,
                 onChange: updateStateContainer,
-                //onSubmit: async (state, component, actions) => {
-                //    console.log("### drop-in::onSubmit:: calling");
-                //    const paymentsReqData = {
-                //        ...state.data,
-                //        reference,
-                //        amount: { currency, value },
-                //        returnUrl,
-                //        origin,
-                //        channel: "Web",
-                //        ...(nativeThreeDS && {
-                //            authenticationData: {
-                //                threeDSRequestData: {
-                //                    nativeThreeDS
-                //                }
-                //            }
-                //        })
-                //    };
-                //    await handlePayment(paymentsReqData, actions);
-                //},
                 onSubmit: async (state, component, actions) => {
                     console.log('### card::onSubmit:: calling');
                 
