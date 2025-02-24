@@ -1,3 +1,4 @@
 .env
 server/certs/server.key
 server/certs/server.crt
+node_modules/
