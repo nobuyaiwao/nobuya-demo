@@ -1,36 +1,72 @@
-import { getClientConfig, fetchPaymentMethods, makePayment, makeDetails, updateStateContainer, updatePaymentsLog } from "./util.js";
+import {
+    getClientConfig,
+    fetchPaymentMethods,
+    makePayment,
+    makeDetails,
+    updateStateContainer,
+    updatePaymentsLog,
+    generateReference,
+    generateReturnUrl,
+    handleTestCardCopying
+} from "../util.js";
 
-// 🔹 Handle test card copying
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".copy-btn").forEach(button => {
-        button.addEventListener("click", (event) => {
-            event.stopPropagation();
-            const cardNumber = button.parentElement.dataset.card;
-            navigator.clipboard.writeText(cardNumber).then(() => {
-                console.log(`Copied card number: ${cardNumber}`);
-                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                setTimeout(() => button.innerHTML = '<i class="fas fa-copy"></i> Copy', 1500);
-            }).catch(err => console.error("Failed to copy card number:", err));
-        });
-    });
+// 🔹 Enable test card copying
+handleTestCardCopying();
+
+// 🔹 Function to get URL query parameters
+const getQueryParam = (param) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+};
+
+// 🔹 Handle redirection back to call /details
+document.addEventListener("DOMContentLoaded", async () => {
+    console.log("DOM fully loaded, processing redirect result...");
+
+    const redirectResult = getQueryParam("redirectResult");
+    if (!redirectResult) return;
+
+    console.log("Redirect result detected:", redirectResult);
+
+    // Hide input fields, button, and state-container
+    const inputContainer = document.querySelector(".input-container");
+    const startPaymentButton = document.getElementById("start-payment");
+    const stateContainer = document.getElementById("state-container");
+
+    if (inputContainer) inputContainer.style.display = "none";
+    if (startPaymentButton) startPaymentButton.style.display = "none";
+    if (stateContainer) stateContainer.style.display = "none";
+
+    const dropinContainer = document.getElementById("dropin-container");
+    if (!dropinContainer) {
+        console.error("dropin-container not found in the DOM.");
+        return;
+    }
+
+    dropinContainer.innerHTML = "<p>Processing your payment...</p>";
+
+    try {
+        // Call /payments/details with redirectResult
+        const detailsResult = await makeDetails({ details: { redirectResult } });
+
+        // Log details response in debug console
+        updatePaymentsLog("Details Response", detailsResult);
+
+        // Show final result in dropin-container
+        dropinContainer.innerHTML = `
+            <h2>Payment Result</h2>
+            <p><strong>Status:</strong> ${detailsResult.resultCode}</p>
+        `;
+
+        console.log("Details processed successfully:", detailsResult);
+    } catch (error) {
+        console.error("Error processing redirect result:", error);
+    }
 });
-
-// 🔹 Generate a merchant reference
-const generateReference = () => {
-    const now = new Date();
-    return `nobuya-demo-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-` +
-           `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-};
-
-// 🔹 Generate return URL based on reference
-const generateReturnUrl = (reference) => {
-    const host = window.location.origin;
-    return `${host}/returnurl.html?reference=${reference}`;
-};
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM fully loaded and parsed.");
-    
+
     const referenceField = document.getElementById("reference");
     const returnUrlField = document.getElementById("returnUrl");
 
@@ -88,12 +124,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 onChange: updateStateContainer,
                 onSubmit: async (state, component, actions) => {
                     console.log('### card::onSubmit:: calling');
-                
+
                     try {
-                        // 🔹 Hide state.data display after submission
                         document.getElementById("state-container").style.display = "none";
 
-                        // 🔹 Call makePayment(), which already logs the request & response
                         const paymentsReqData = {
                             ...state.data,
                             reference,
@@ -111,16 +145,16 @@ document.addEventListener("DOMContentLoaded", () => {
                         };
 
                         const { action, resultCode } = await makePayment(paymentsReqData);
-                
+
                         if (!resultCode) {
                             console.error("Payment failed, missing resultCode.");
                             actions.reject();
                             return;
                         }
-                
+
                         console.log("Handling action:", action);
                         actions.resolve({ resultCode, action });
-                
+
                     } catch (error) {
                         console.error("Payment error:", error);
                         actions.reject();
@@ -128,28 +162,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 },
                 onAdditionalDetails: async (state, component, actions) => {
                     console.log("### card::onAdditionalDetails:: calling");
-                
+
                     try {
-                        // 🔹 Call makeDetails(), which already logs the request & response
                         const result = await makeDetails(state.data);
-                
+
                         if (!result.resultCode) {
                             console.error("Additional details processing failed: Missing resultCode.");
                             actions.reject();
                             return;
                         }
-                
+
                         const { resultCode, action, order, donationToken } = result;
-                
+
                         console.log("Handling additional details:", { resultCode, action, order, donationToken });
-                
+
                         actions.resolve({
                             resultCode,
                             action,
                             order,
                             donationToken,
                         });
-                
+
                     } catch (error) {
                         console.error("Additional details processing error:", error);
                         actions.reject();

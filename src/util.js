@@ -1,3 +1,41 @@
+// 🔹 Handle test card copying
+export const handleTestCardCopying = () => {
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".copy-btn").forEach(button => {
+            button.addEventListener("click", (event) => {
+                event.stopPropagation();
+                const cardNumber = button.parentElement.dataset.card;
+                navigator.clipboard.writeText(cardNumber).then(() => {
+                    console.log(`Copied card number: ${cardNumber}`);
+                    button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => button.innerHTML = '<i class="fas fa-copy"></i> Copy', 1500);
+                }).catch(err => console.error("Failed to copy card number:", err));
+            });
+        });
+    });
+};
+
+// 🔹 Generate a merchant reference
+export const generateReference = () => {
+    const now = new Date();
+    return `nobuya-demo-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-` +
+           `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+};
+
+//// 🔹 Generate return URL (redirects back to index.html)
+//export const generateReturnUrl = () => {
+//    const host = window.location.origin;
+//    return `${host}/index.html`;
+//};
+
+// 🔹 Generate return URL dynamically based on the current path
+export const generateReturnUrl = () => {
+    const host = window.location.origin;
+    const path = window.location.pathname.split("/").slice(0, -1).join("/"); // Get the current directory
+    return `${host}${path}/index.html`;
+};
+
+
 // 🔹 Fetch payment methods from the backend
 export const fetchPaymentMethods = async (options) => {
     try {
