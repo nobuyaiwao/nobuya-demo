@@ -218,3 +218,26 @@ input:checked + .slider:before {
     font-size: 0.85rem; /* ✅ COPYボタンと高さを揃える */
 }
 
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.button-group button {
+    padding: 10px 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.button-group button:hover {
+    background-color: #0056b3;
+}
+

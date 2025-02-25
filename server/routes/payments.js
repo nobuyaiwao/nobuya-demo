@@ -27,13 +27,13 @@ console.log(`Using Adyen API URL: ${ADYEN_API_URL}`);
 // 🔹 Fetch available payment methods from Adyen
 router.post("/paymentMethods", async (req, res) => {
     try {
-        const response = await axios.post(`${ADYEN_API_URL}/paymentMethods`, {
-            merchantAccount: process.env.ADYEN_MERCHANT_ACCOUNT,
-            countryCode: req.body.countryCode || "US",
-            amount: req.body.amount || { currency: "USD", value: 1000 },
-            shopperLocale: "en_US",
-            channel: "Web"
-        }, {
+        // Extend the request body with merchantAccount
+        const requestData = {
+            ...req.body,
+            merchantAccount: process.env.ADYEN_MERCHANT_ACCOUNT
+        };
+
+        const response = await axios.post(`${ADYEN_API_URL}/paymentMethods`, requestData, {
             headers: {
                 "X-API-Key": process.env.ADYEN_API_KEY,
                 "Content-Type": "application/json"

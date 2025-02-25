@@ -39,6 +39,7 @@ export const generateReturnUrl = () => {
 // 🔹 Fetch payment methods from the backend
 export const fetchPaymentMethods = async (options) => {
     try {
+        console.log(JSON.stringify(options));
         const response = await fetch("/api/paymentMethods", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
