@@ -95,6 +95,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
         const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
         const origin = window.location.origin;
+        const shopperReference = document.getElementById("shopperReference")?.value || "guest";
+        const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
+
 
         if (isNaN(value) || value <= 0) {
             console.error("Invalid amount value. Please enter a valid number.");
@@ -103,7 +106,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const pmReqConfig = {
             countryCode,
-            amount: { currency, value }
+            amount: { currency, value },
+            shopperReference 
         };
 
         console.log("Payment request configuration:", pmReqConfig);
@@ -114,6 +118,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
+
+
+            // card configuration
+            const cardConfiguration = {
+                hasHolderName: true,
+                showStoredPaymentMethods: true, 
+                enableStoreDetails: true
+            };
+
+            // dropin configuration
+            const dropinConfiguration = {
+                //paymentMethodComponents: [Card, PayPal, GooglePay, ApplePay, Ideal],
+                instantPaymentTypes: ['applepay', 'googlepay'],
+                paymentMethodsConfiguration : {
+                    card : cardConfiguration
+                }
+            };
 
             const configObj = {
                 paymentMethodsResponse,
@@ -132,6 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             ...state.data,
                             reference,
                             amount: { currency, value },
+                            shopperReference,
                             returnUrl,
                             origin,
                             channel: "Web",
@@ -141,7 +163,9 @@ document.addEventListener("DOMContentLoaded", () => {
                                         nativeThreeDS
                                     }
                                 }
-                            })
+                            }),
+                            storePaymentMethod: true,       // ??
+                            recurringProcessingModel
                         };
 
                         const { action, resultCode } = await makePayment(paymentsReqData);
@@ -192,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const { AdyenCheckout, Dropin } = window.AdyenWeb;
             const checkout = await AdyenCheckout(configObj);
-            new Dropin(checkout).mount("#dropin-container");
+            new Dropin(checkout,dropinConfiguration).mount("#dropin-container");
 
         } catch (error) {
             console.error("Error during initialization:", error);
