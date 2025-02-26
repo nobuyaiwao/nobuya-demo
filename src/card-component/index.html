@@ -4,13 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Card Component (Advanced Flow)</title>
-    <script src="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.8.0/adyen.js"
+    <!--script src="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.8.0/adyen.js"
      integrity="sha384-bxVQwK8MZv5Nf5/TghsCZJ23F+FnlBAKG/6/8XE4SIThMQVLWys04oJ/HhJ+bXKD"
      crossorigin="anonymous"></script>
     <link rel="stylesheet"
      href="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.8.0/adyen.css"
      integrity="sha384-1wJDkAPA2mYXJa7x50LZnHo7oWi5ykc0h7co761i7dtY5Wg4LPCg2i/Q6xDQX02X"
-     crossorigin="anonymous">
+     crossorigin="anonymous"-->
+
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.1.0/adyen.js"
+     crossorigin="anonymous"></script>
+
+    <link rel="stylesheet"
+     href="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.1.0/adyen.css"
+
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -26,13 +34,62 @@
 
                 <label for="amount">Amount</label>
                 <input type="number" id="amount" value="5000">
+
+                <label for="reference">Reference</label>
+                <input type="text" id="reference" readonly>
+
+                <label for="returnUrl">Return URL</label>
+                <input type="text" id="returnUrl" placeholder="Generating..." value="">
+
+                <label for="nativeThreeDS">Enable 3DS Native</label>
+                <label class="switch">
+                    <input type="checkbox" id="nativeThreeDS">
+                    <span class="slider round"></span>
+                </label>
+
+                <div class="input-group">
+                    <label for="shopperReference">Shopper Reference:</label>
+                    <input type="text" id="shopperReference" value="nobuya-demo-user" placeholder="Enter shopper ID">
+                    <label for="recurringProcessingModel">Recurring Model:</label>
+                    <select id="recurringProcessingModel">
+                        <option value="CardOnFile" selected>Card On File</option>
+                        <option value="Subscription">Subscription</option>
+                        <option value="UnscheduledCardOnFile">Unscheduled Card On File</option>
+                    </select>
+                </div>
             </div>
+
             <button id="start-payment">Here we go!</button>
             <div id="card-container"></div>
+
+            <div class="button-group">
+                <button onclick="window.location.href='../index.html'">Go Back</button>
+                <button onclick="window.location.reload();">Reload Page</button>
+            </div>
+
         </div>
 
         <div class="right-panel">
             <h2>Debug Console</h2>
+
+            <!-- 🔹 Test Cards Section -->
+            <div class="test-cards">
+                <h3>Test Cards</h3>
+                <div class="test-card" data-card="4111111111111111">
+                    <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                    <span>3DS Not Enrolled (4111 1111 1111 1111)</span>
+                </div>
+                <div class="test-card" data-card="4917610000000000">
+                    <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                    <span>3DS Standard (4917 6100 0000 0000)</span>
+                </div>
+                <div class="test-card" data-card="4212345678910006">
+                    <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                    <span>3DS Frictionless (4212 3456 7891 0006)</span>
+                </div>
+            </div>
+
+            <!-- 🔹 Debug Sections -->
             <div class="debug-section">
                 <h3>State Changes</h3>
                 <pre id="state-container">Waiting for state updates...</pre>

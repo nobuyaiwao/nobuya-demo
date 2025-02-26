@@ -6,14 +6,10 @@ import {
     updateStateContainer,
     updatePaymentsLog,
     generateReference,
-    generateReturnUrl,
-    handleTestCardCopying
+    generateReturnUrl
 } from "../util.js";
 
-// 🔹 Enable test card copying
-handleTestCardCopying();
-
-// 🔹 Function to initialize the Card Component
+// 🔹 Function to initialize the Stored Card Component
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("DOM fully loaded and parsed.");
 
@@ -43,10 +39,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const value = parseInt(document.getElementById("amount")?.value || "5000", 10);
         const reference = document.getElementById("reference")?.value;
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
-        const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
         const origin = window.location.origin;
         const shopperReference = document.getElementById("shopperReference")?.value || "guest";
-        const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
 
         if (isNaN(value) || value <= 0) {
             console.error("Invalid amount value. Please enter a valid number.");
@@ -68,10 +62,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
-            // Card component configuration
-            const cardConfiguration = {
-                hasHolderName: true,
-                enableStoreDetails: true
+            // Stored Card configuration
+            const storedCardConfiguration = {
+                hideCVC: true
             };
 
             const configObj = {
@@ -82,7 +75,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 countryCode,
                 onChange: updateStateContainer,
                 onSubmit: async (state, component, actions) => {
-                    console.log('### card::onSubmit:: calling');
+                    console.log('### stored-card::onSubmit:: calling');
 
                     try {
                         document.getElementById("state-container").style.display = "none";
@@ -94,49 +87,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                             shopperReference,
                             returnUrl,
                             origin,
-                            channel: "Web",
-                            ...(nativeThreeDS && {
-                                authenticationData: {
-                                    threeDSRequestData: {
-                                        nativeThreeDS
-                                    }
-                                }
-                            }),
-                            storePaymentMethod: true,
-                            recurringProcessingModel
+                            channel: "Web"
                         };
 
                         updatePaymentsLog("Payment Request", paymentsReqData);
-                        //const { action, resultCode } = await makePayment(paymentsReqData);
-                        const result = await makePayment(paymentsReqData);
-                        //updatePaymentsLog("Payment Response", { resultCode, action });
-                        updatePaymentsLog("Payment Response", result );
+                        const { action, resultCode } = await makePayment(paymentsReqData);
+                        updatePaymentsLog("Payment Response", { resultCode, action });
 
-                        if (!result.resultCode) {
-                        //if (!resultCode) {
+                        if (!resultCode) {
                             console.error("Payment failed, missing resultCode.");
                             actions.reject();
                             return;
                         }
 
-                        const {
-                            resultCode,
-                            action,
-                            order,
-                            donationToken
-                        } = result;
-
-                        //console.log("Handling action:", action);
-                        //console.log("actions.resolve with - ", resultCode);
-                        //actions.resolve({ resultCode });
-                        //actions.resolve({ resultCode, action });
-
-                        actions.resolve({
-                            resultCode,
-                            action,
-                            order,
-                            donationToken,
-                        });
+                        console.log("Handling action:", action);
+                        actions.resolve({ resultCode, action });
 
                     } catch (error) {
                         console.error("Payment error:", error);
@@ -144,7 +109,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 },
                 onAdditionalDetails: async (state, component, actions) => {
-                    console.log("### card::onAdditionalDetails:: calling");
+                    console.log("### stored-card::onAdditionalDetails:: calling");
 
                     try {
                         updatePaymentsLog("Details Request", state.data);
@@ -160,8 +125,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const { resultCode, action } = result;
 
                         console.log("Handling additional details:", { resultCode, action });
-                        actions.resolve({ resultCode });
-                        //actions.resolve({ resultCode, action });
+                        actions.resolve({ resultCode, action });
                     } catch (error) {
                         console.error("Additional details processing error:", error);
                         actions.reject();
@@ -171,9 +135,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const { AdyenCheckout, Card } = window.AdyenWeb;
             const checkout = await AdyenCheckout(configObj);
-            const card = new Card(checkout,cardConfiguration).mount("#card-container");
-            //const cardComponent = checkout.create("card", cardConfiguration);
-            //cardComponent.mount("#card-container");
+
+            // Mount stored card payment method
+            const storedPaymentMethod = checkout.paymentMethodsResponse.storedPaymentMethods[0];
+            const storedCardComponent = new Card(checkout,{
+                ...storedPaymentMethod,
+                hideCVC: true
+            }).mount("#stored-card-container");
 
         } catch (error) {
             console.error("Error during initialization:", error);

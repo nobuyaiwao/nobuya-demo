@@ -131,6 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const dropinConfiguration = {
                 //paymentMethodComponents: [Card, PayPal, GooglePay, ApplePay, Ideal],
                 instantPaymentTypes: ['applepay', 'googlepay'],
+                showPaymentMethods: false,
                 paymentMethodsConfiguration : {
                     card : cardConfiguration
                 }
@@ -139,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                locale: "ja-JP",
+                locale: "en-US",
                 environment: config.environment,
                 countryCode,
                 onChange: updateStateContainer,

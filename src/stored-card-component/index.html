@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stored Card Payment</title>
+    <script src="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.8.0/adyen.js"
+     integrity="sha384-bxVQwK8MZv5Nf5/TghsCZJ23F+FnlBAKG/6/8XE4SIThMQVLWys04oJ/HhJ+bXKD"
+     crossorigin="anonymous"></script>
+    <link rel="stylesheet"
+     href="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.8.0/adyen.css"
+     integrity="sha384-1wJDkAPA2mYXJa7x50LZnHo7oWi5ykc0h7co761i7dtY5Wg4LPCg2i/Q6xDQX02X"
+     crossorigin="anonymous">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <h1>Stored Card Payment</h1>
+            <div class="input-container">
+                <label for="countryCode">Country Code</label>
+                <input type="text" id="countryCode" value="JP">
+
+                <label for="currency">Currency</label>
+                <input type="text" id="currency" value="JPY">
+
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" value="5000">
+
+                <label for="reference">Reference</label>
+                <input type="text" id="reference" readonly>
+
+                <label for="returnUrl">Return URL</label>
+                <input type="text" id="returnUrl" placeholder="Generating..." value="">
+
+                <label for="shopperReference">Shopper Reference:</label>
+                <input type="text" id="shopperReference" value="nobuya-demo-user" placeholder="Enter shopper ID">
+            </div>
+            <button id="start-payment">Here we go!</button>
+            <div id="stored-card-container"></div>
+
+            <div class="button-group">
+                <button onclick="window.location.href='../index.html'">Go Back</button>
+                <button onclick="window.location.reload();">Reload Page</button>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <h2>Debug Console</h2>
+            <div class="debug-section">
+                <h3>State Changes</h3>
+                <pre id="state-container">Waiting for state updates...</pre>
+            </div>
+            <div class="debug-section">
+                <h3>Payments API Logs</h3>
+                <pre id="payments-container">No payment requests yet...</pre>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./stored-card-component.js"></script>
+</body>
+</html>
+
