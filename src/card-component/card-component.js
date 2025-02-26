@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                locale: "ja-JP",
+                locale: "en-US",
                 environment: config.environment,
                 countryCode,
                 onChange: updateStateContainer,
@@ -107,13 +107,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                         };
 
                         updatePaymentsLog("Payment Request", paymentsReqData);
-                        //const { action, resultCode } = await makePayment(paymentsReqData);
                         const result = await makePayment(paymentsReqData);
-                        //updatePaymentsLog("Payment Response", { resultCode, action });
                         updatePaymentsLog("Payment Response", result );
 
                         if (!result.resultCode) {
-                        //if (!resultCode) {
                             console.error("Payment failed, missing resultCode.");
                             actions.reject();
                             return;
@@ -125,11 +122,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                             order,
                             donationToken
                         } = result;
-
-                        //console.log("Handling action:", action);
-                        //console.log("actions.resolve with - ", resultCode);
-                        //actions.resolve({ resultCode });
-                        //actions.resolve({ resultCode, action });
 
                         actions.resolve({
                             resultCode,
@@ -166,6 +158,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                         console.error("Additional details processing error:", error);
                         actions.reject();
                     }
+                },
+                onPaymentCompleted: async (result, component) => {
+
+                    console.log("### card::onPaymentCompleted:: calling");
+                    console.log(result);
+
+                    const cardContainer = document.getElementById("card-container");
+                    cardContainer.innerHTML = `
+                        <h2>Payment Result</h2>
+                        <p><strong>Status:</strong> ${result.resultCode}</p>
+                    `;
+
                 }
             };
 
