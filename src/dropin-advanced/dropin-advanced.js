@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const dropinConfiguration = {
                 //paymentMethodComponents: [Card, PayPal, GooglePay, ApplePay, Ideal],
                 instantPaymentTypes: ['applepay', 'googlepay'],
-                showPaymentMethods: false,
+                //showPaymentMethods: false,
                 paymentMethodsConfiguration : {
                     card : cardConfiguration
                 }
