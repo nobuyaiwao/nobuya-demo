@@ -67,10 +67,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                 hideCVC: true
             };
 
+            const translations = {
+                "ja-JP": {
+                    "payButton": "決済",
+                    "form.instruction": ""
+                }
+            };
+
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
                 locale: "ja-JP",
+                translations,
                 environment: config.environment,
                 countryCode,
                 onChange: updateStateContainer,

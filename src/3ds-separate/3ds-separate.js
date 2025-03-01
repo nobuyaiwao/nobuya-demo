@@ -6,12 +6,8 @@ import {
     updateStateContainer,
     updatePaymentsLog,
     generateReference,
-    generateReturnUrl,
-    handleTestCardCopying
+    generateReturnUrl
 } from "../util.js";
-
-// 🔹 Enable test card copying
-handleTestCardCopying();
 
 // 🔹 Function to get URL query parameters
 const getQueryParam = (param) => {
@@ -37,13 +33,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (startPaymentButton) startPaymentButton.style.display = "none";
     if (stateContainer) stateContainer.style.display = "none";
 
-    const dropinContainer = document.getElementById("dropin-container");
-    if (!dropinContainer) {
-        console.error("dropin-container not found in the DOM.");
+    const cardContainer = document.getElementById("card-container");
+    if (!cardContainer) {
+        console.error("card-container not found in the DOM.");
         return;
     }
 
-    dropinContainer.innerHTML = "<p>Processing your payment...</p>";
+    cardContainer.innerHTML = "<p>Processing your payment...</p>";
 
     try {
         // Call /payments/details with redirectResult
@@ -52,8 +48,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Log details response in debug console
         updatePaymentsLog("Details Response", detailsResult);
 
-        // Show final result in dropin-container
-        dropinContainer.innerHTML = `
+        // Show final result in card-container
+        cardContainer.innerHTML = `
             <h2>Payment Result</h2>
             <p><strong>Status:</strong> ${detailsResult.resultCode}</p>
         `;
@@ -64,17 +60,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM fully loaded and parsed.");
 
-    const referenceField = document.getElementById("reference");
-    const returnUrlField = document.getElementById("returnUrl");
+// 🔹 Function to initialize the 3D Secure separate flow
+const initializePayment = async () => {
+    console.log("Initializing payment...");
 
-    if (referenceField && returnUrlField) {
-        const reference = generateReference();
-        referenceField.value = reference;
-        returnUrlField.placeholder = generateReturnUrl(reference);
-    }
+    const reference = generateReference();
+    document.getElementById("reference").value = reference;
+    document.getElementById("returnUrl").placeholder = generateReturnUrl(reference);
 
     const startPaymentButton = document.getElementById("start-payment");
     if (!startPaymentButton) {
@@ -83,21 +76,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     startPaymentButton.addEventListener("click", async () => {
-        console.log("Here we go! button clicked.");
-
+        console.log("Starting payment...");
         document.querySelector(".input-container").style.display = "none";
         startPaymentButton.style.display = "none";
 
-        const countryCode = document.getElementById("countryCode")?.value || "JP";
-        const currency = document.getElementById("currency")?.value || "JPY";
-        const value = parseInt(document.getElementById("amount")?.value || "5000", 10);
+        const countryCode = document.getElementById("countryCode").value || "JP";
+        const currency = document.getElementById("currency").value || "JPY";
+        const value = parseInt(document.getElementById("amount").value || "5000", 10);
+        const origin = window.location.origin;
         const reference = document.getElementById("reference")?.value;
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
         const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
-        const origin = window.location.origin;
         const shopperReference = document.getElementById("shopperReference")?.value || "guest";
         const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
-
 
         if (isNaN(value) || value <= 0) {
             console.error("Invalid amount value. Please enter a valid number.");
@@ -106,11 +97,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const pmReqConfig = {
             countryCode,
-            amount: { currency, value },
-            shopperReference 
+            amount: { currency, value }
         };
-
-        console.log("Payment request configuration:", pmReqConfig);
 
         try {
             const config = await getClientConfig();
@@ -119,22 +107,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
-
-            // card configuration
             const cardConfiguration = {
                 hasHolderName: true,
-                showStoredPaymentMethods: true, 
                 enableStoreDetails: true
-            };
-
-            // dropin configuration
-            const dropinConfiguration = {
-                //paymentMethodComponents: [Card, PayPal, GooglePay, ApplePay, Ideal],
-                instantPaymentTypes: ['applepay', 'googlepay'],
-                //showPaymentMethods: false,
-                paymentMethodsConfiguration : {
-                    card : cardConfiguration
-                }
             };
 
             const configObj = {
@@ -143,13 +118,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 locale: "en-US",
                 environment: config.environment,
                 countryCode,
-                onChange: updateStateContainer,
                 onSubmit: async (state, component, actions) => {
-                    console.log('### card::onSubmit:: calling');
-
+                    console.log("### 3ds-separate::onSubmit:: calling");
                     try {
-                        document.getElementById("state-container").style.display = "none";
-
+                        //const paymentsReqData = {
+                        //    ...state.data,
+                        //    reference,
+                        //    amount: { currency, value },
+                        //    returnUrl: generateReturnUrl(reference),
+                        //    origin,
+                        //    channel: "Web"
+                        //};
                         const paymentsReqData = {
                             ...state.data,
                             reference,
@@ -165,67 +144,39 @@ document.addEventListener("DOMContentLoaded", () => {
                                     }
                                 }
                             }),
-                            storePaymentMethod: true,       // ??
+                            storePaymentMethod: true,
                             recurringProcessingModel
                         };
 
-                        const { action, resultCode } = await makePayment(paymentsReqData);
+                        updatePaymentsLog("Payment Request", paymentsReqData);
+                        const result = await makePayment(paymentsReqData);
+                        updatePaymentsLog("Payment Response", result);
 
-                        if (!resultCode) {
-                            console.error("Payment failed, missing resultCode.");
-                            actions.reject();
+                        if (result.action && result.action.subtype === "challenge") {
+                        //if (result.action && result.action.type === "threeDS2Challenge") {
+                            sessionStorage.setItem("threeDSAction", JSON.stringify(result.action));
+                            sessionStorage.setItem("countryCode", countryCode);
+                            window.location.href = "challenge.html";
                             return;
                         }
 
-                        console.log("Handling action:", action);
-                        actions.resolve({ resultCode, action });
-
+                        actions.resolve(result);
                     } catch (error) {
                         console.error("Payment error:", error);
                         actions.reject();
                     }
-                },
-                onAdditionalDetails: async (state, component, actions) => {
-                    console.log("### card::onAdditionalDetails:: calling");
-
-                    try {
-                        const result = await makeDetails(state.data);
-
-                        if (!result.resultCode) {
-                            console.error("Additional details processing failed: Missing resultCode.");
-                            actions.reject();
-                            return;
-                        }
-
-                        const { resultCode, action, order, donationToken } = result;
-
-                        console.log("Handling additional details:", { resultCode, action, order, donationToken });
-
-                        actions.resolve({
-                            resultCode,
-                            action,
-                            order,
-                            donationToken,
-                        });
-
-                    } catch (error) {
-                        console.error("Additional details processing error:", error);
-                        actions.reject();
-                    }
-                },
-                onError: (error,component) => {
-                    console.log("### card::onError:: calling");
-                    console.log(error);
                 }
             };
 
-            const { AdyenCheckout, Dropin } = window.AdyenWeb;
+            const { AdyenCheckout, Card } = window.AdyenWeb;
             const checkout = await AdyenCheckout(configObj);
-            new Dropin(checkout,dropinConfiguration).mount("#dropin-container");
+            const card = new Card(checkout,cardConfiguration).mount("#card-container");
 
         } catch (error) {
             console.error("Error during initialization:", error);
         }
     });
-});
+};
+
+document.addEventListener("DOMContentLoaded", initializePayment);
 

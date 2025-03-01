@@ -3,26 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stored Card Payment</title>
-    <script src="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.8.0/adyen.js"
-     integrity="sha384-bxVQwK8MZv5Nf5/TghsCZJ23F+FnlBAKG/6/8XE4SIThMQVLWys04oJ/HhJ+bXKD"
+    <title>3D Secure - Separate Flow</title>
+    <script src="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.1.0/adyen.js"
      crossorigin="anonymous"></script>
     <link rel="stylesheet"
-     href="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.8.0/adyen.css"
-     integrity="sha384-1wJDkAPA2mYXJa7x50LZnHo7oWi5ykc0h7co761i7dtY5Wg4LPCg2i/Q6xDQX02X"
+     href="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.1.0/adyen.css"
      crossorigin="anonymous">
     <link rel="stylesheet" href="/styles.css">
-    <style>
-        .adyen-checkout__field--storedCard {
-            display: none !important;
-        }
-    </style>
-
 </head>
 <body>
     <div class="container">
         <div class="left-panel">
-            <h1>Stored Card Payment</h1>
+            <h1>3D Secure - Separate Flow</h1>
             <div class="input-container">
                 <label for="countryCode">Country Code</label>
                 <input type="text" id="countryCode" value="JP">
@@ -39,11 +31,15 @@
                 <label for="returnUrl">Return URL</label>
                 <input type="text" id="returnUrl" placeholder="Generating..." value="">
 
-                <label for="shopperReference">Shopper Reference:</label>
-                <input type="text" id="shopperReference" value="nobuya-demo-user" placeholder="Enter shopper ID">
+                <label for="nativeThreeDS">Enable 3DS Native</label>
+                <label class="switch">
+                    <input type="checkbox" id="nativeThreeDS">
+                    <span class="slider round"></span>
+                </label>
             </div>
-            <button id="start-payment">Here we go!</button>
-            <div id="stored-card-container"></div>
+
+            <button id="start-payment">Start Payment</button>
+            <div id="card-container"></div>
 
             <div class="button-group">
                 <button onclick="window.location.href='../index.html'">Go Back</button>
@@ -64,7 +60,7 @@
         </div>
     </div>
 
-    <script type="module" src="./stored-card-component.js"></script>
+    <script type="module" src="./3ds-separate.js"></script>
 </body>
 </html>
 
