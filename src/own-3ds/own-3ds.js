@@ -70,10 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         amount: { currency, value },
                         returnUrl,
                         channel: "Web",
-                        threeDS2RequestData: {
-                            notificationURL,
-                            threeDSCompInd:"Y"
-                        },
+                        threeDS2RequestData: { notificationURL },
                         authenticationData: nativeThreeDS ? { threeDSRequestData: { nativeThreeDS } } : undefined
                     };
                     updatePaymentsLog("Payment Request", paymentData);
@@ -273,5 +270,47 @@ async function initiate3DSChallenge(action) {
     
     form.submit();
     console.log("3DS Challenge Initiated");
+
+    listenFor3DSChallengeNotification(action);
+}
+
+// Listen for 3DS Challenge notification (CRes)
+async function listenFor3DSChallengeNotification(action) {
+    let attempts = 0;
+    const maxAttempts = 100;
+
+    while (attempts < maxAttempts) {
+        try {
+            const response = await fetch("/own-3ds/notification-check");
+            const data = await response.json();
+
+            if (data.cres) {
+                console.log("3DS Challenge notification received, proceeding to /details");
+                sendChallengeDetailsRequest(action, data.cres);
+                return;
+            }
+        } catch (error) {
+            console.error("Error checking 3DS Challenge notification", error);
+        }
+
+        attempts++;
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
+
+    console.error("3DS Challenge result not received in time");
+}
+
+// Send /details request for ChallengeShopper
+async function sendChallengeDetailsRequest(action, cres) {
+    const detailsRequest = {
+        details: {
+            "threeds2.challengeResult": cres
+        },
+        paymentData: action.paymentData
+    };
+
+    const result = await makeDetails(detailsRequest);
+    updatePaymentsLog("Details Response", result);
+    handle3DSFlow(result);
 }
 

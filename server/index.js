@@ -25,28 +25,50 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../src/index.html"));
 });
 
-// 3DS notification endpoint
-let latestThreeDSMethodData = null;
+//// 3DS notification endpoint
+//let latestThreeDSMethodData = null;
+//
+//app.post("/own-3ds/notification", (req, res) => {
+//    const threeDSMethodData = req.body.threeDSMethodData || (req.body && Object.keys(req.body)[0]);
+//
+//    if (!threeDSMethodData) {
+//        console.error("Invalid 3DS notification received:", req.body);
+//        return res.status(400).send("Invalid request");
+//    }
+//
+//    console.log("Processed 3DS notification:", threeDSMethodData);
+//    latestThreeDSMethodData = threeDSMethodData;
+//    res.sendStatus(200);
+//});
+//
+//// Notification check route
+//app.get("/own-3ds/notification-check", (req, res) => {
+//    res.json({ threeDSMethodData: latestThreeDSMethodData });
+//});
+
+// 3DS notification handler
+let latest3DSNotification = null;
 
 app.post("/own-3ds/notification", (req, res) => {
-    //console.log("Raw 3DS notification body:", req.body); 
+    const requestData = req.body || {};
+    const threeDSMethodData = requestData.threeDSMethodData || null;
+    const cres = requestData.cres || null;
 
-    const threeDSMethodData = req.body.threeDSMethodData || (req.body && Object.keys(req.body)[0]);
-
-    if (!threeDSMethodData) {
+    if (!threeDSMethodData && !cres) {
         console.error("Invalid 3DS notification received:", req.body);
         return res.status(400).send("Invalid request");
     }
 
-    console.log("Processed 3DS notification:", threeDSMethodData);
-    latestThreeDSMethodData = threeDSMethodData;
+    latest3DSNotification = { threeDSMethodData, cres };
+    console.log("Processed 3DS notification:", latest3DSNotification);
     res.sendStatus(200);
 });
 
 // Notification check route
 app.get("/own-3ds/notification-check", (req, res) => {
-    res.json({ threeDSMethodData: latestThreeDSMethodData });
+    res.json(latest3DSNotification || {});
 });
+
 
 // Start the server
 app.listen(PORT, () => {
