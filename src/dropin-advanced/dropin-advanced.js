@@ -13,6 +13,11 @@ import {
 // 🔹 Enable test card copying
 handleTestCardCopying();
 
+// Load shared test-cards.js
+const script = document.createElement("script");
+script.src = "/test-cards.js";
+document.body.appendChild(script);
+
 // 🔹 Function to get URL query parameters
 const getQueryParam = (param) => {
     const urlParams = new URLSearchParams(window.location.search);
