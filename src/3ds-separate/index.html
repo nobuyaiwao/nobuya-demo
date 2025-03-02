@@ -33,7 +33,7 @@
 
                 <label for="nativeThreeDS">Enable 3DS Native</label>
                 <label class="switch">
-                    <input type="checkbox" id="nativeThreeDS">
+                    <input type="checkbox" id="nativeThreeDS" checked>
                     <span class="slider round"></span>
                 </label>
             </div>
@@ -48,7 +48,11 @@
         </div>
 
         <div class="right-panel">
+
             <h2>Debug Console</h2>
+            <!-- 🔹 Test Cards Section -->
+            <div id="test-cards-container"></div>
+
             <div class="debug-section">
                 <h3>State Changes</h3>
                 <pre id="state-container">Waiting for state updates...</pre>
@@ -60,6 +64,7 @@
         </div>
     </div>
 
+    <script src="/test-cards.js"></script>
     <script type="module" src="./3ds-separate.js"></script>
 </body>
 </html>

@@ -36,18 +36,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             locale: "en-US",
             countryCode,
             environment: config.environment,
-            //onAdditionalDetails: async (state, component, actions) => {
-            //    // Make the /payments/details call and pass the resultCode back to the Component.
-            //    const { action, resultCode } = await makeDetails(state.data);
-            //    actions.resolve({ resultCode : resultCode });
-            //},
             onAdditionalDetails: async (state, component, actions) => {
                 console.log("### challenge::onAdditionalDetails:: calling");
                 
                 try {
                     updatePaymentsLog("Details Request", state.data);
                     const result = await makeDetails(state.data);
-                    //const { action, resultCode } = result ; 
                     const { resultCode, action, order, donationToken } = result;
                     updatePaymentsLog("Details Response", result);
 
@@ -56,17 +50,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                         return;
                     }
 
-                    console.log("Handling additional details:", { resultCode, action, order, donationToken });
+                    //console.log("Handling additional details:", { resultCode, action, order, donationToken });
 
-                    actions.resolve({
-                        resultCode,
-                        action,
-                        order,
-                        donationToken,
-                    });
+                    //actions.resolve({
+                    //    resultCode,
+                    //    action,
+                    //    order,
+                    //    donationToken,
+                    //});
 
-                    //console.log("Challenge completed, redirecting back...");
-                    //window.location.href = `index.html?redirectResult=${encodeURIComponent(result.resultCode)}`;
+                    console.log("Challenge completed, redirecting back...");
+                    window.location.href = `index.html?redirectResult=${encodeURIComponent(result.resultCode)}`;
 
                 } catch (error) {
                     console.error("Error processing 3DS challenge details:", error);

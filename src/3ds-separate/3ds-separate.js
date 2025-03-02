@@ -6,8 +6,17 @@ import {
     updateStateContainer,
     updatePaymentsLog,
     generateReference,
-    generateReturnUrl
+    generateReturnUrl,
+    handleTestCardCopying
 } from "../util.js";
+
+// 🔹 Enable test card copying
+handleTestCardCopying();
+
+// Load shared test-cards.js
+const script = document.createElement("script");
+script.src = "/test-cards.js";
+document.body.appendChild(script);
 
 // 🔹 Function to get URL query parameters
 const getQueryParam = (param) => {
@@ -42,19 +51,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     cardContainer.innerHTML = "<p>Processing your payment...</p>";
 
     try {
-        // Call /payments/details with redirectResult
-        const detailsResult = await makeDetails({ details: { redirectResult } });
+        //// Call /payments/details with redirectResult
+        //const detailsResult = await makeDetails({ details: { redirectResult } });
 
-        // Log details response in debug console
-        updatePaymentsLog("Details Response", detailsResult);
+        //// Log details response in debug console
+        //updatePaymentsLog("Details Response", detailsResult);
 
         // Show final result in card-container
         cardContainer.innerHTML = `
             <h2>Payment Result</h2>
-            <p><strong>Status:</strong> ${detailsResult.resultCode}</p>
+            <p><strong>Status:</strong> ${redirectResult}</p>
         `;
 
-        console.log("Details processed successfully:", detailsResult);
+        console.log("redirectResult:", redirectResult);
     } catch (error) {
         console.error("Error processing redirect result:", error);
     }
@@ -108,7 +117,7 @@ const initializePayment = async () => {
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
             const cardConfiguration = {
-                hasHolderName: true,
+                hasHolderName: false,
                 enableStoreDetails: true
             };
 
@@ -121,14 +130,6 @@ const initializePayment = async () => {
                 onSubmit: async (state, component, actions) => {
                     console.log("### 3ds-separate::onSubmit:: calling");
                     try {
-                        //const paymentsReqData = {
-                        //    ...state.data,
-                        //    reference,
-                        //    amount: { currency, value },
-                        //    returnUrl: generateReturnUrl(reference),
-                        //    origin,
-                        //    channel: "Web"
-                        //};
                         const paymentsReqData = {
                             ...state.data,
                             reference,
@@ -153,7 +154,6 @@ const initializePayment = async () => {
                         updatePaymentsLog("Payment Response", result);
 
                         if (result.action && result.action.subtype === "challenge") {
-                        //if (result.action && result.action.type === "threeDS2Challenge") {
                             sessionStorage.setItem("threeDSAction", JSON.stringify(result.action));
                             sessionStorage.setItem("countryCode", countryCode);
                             window.location.href = "challenge.html";
