@@ -13,6 +13,12 @@ import {
 // 🔹 Enable test card copying
 handleTestCardCopying();
 
+// 🔹 Function to get URL query parameters
+const getQueryParam = (param) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+};
+
 // 🔹 Function to initialize the Card Component
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("DOM fully loaded and parsed.");
