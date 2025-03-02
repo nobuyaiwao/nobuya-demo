@@ -12,6 +12,11 @@ import {
 
 handleTestCardCopying();
 
+// Load shared test-cards.js
+const script = document.createElement("script");
+script.src = "/test-cards.js";
+document.body.appendChild(script);
+
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("3DS2 Custom Flow Initialized");
 
@@ -91,6 +96,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 });
 
+
 // Handle 3DS manually
 async function handle3DSFlow(result, component) {
     if (!result.resultCode) {
@@ -162,6 +168,8 @@ async function initiate3DSFingerprinting(action) {
 }
 
 // Listen to 3DS notifications
+let notificationReceived = false;
+
 async function listenFor3DSNotification(threeDSServerTransID, action) {
     let attempts = 0;
     const maxAttempts = 10; 
@@ -175,12 +183,9 @@ async function listenFor3DSNotification(threeDSServerTransID, action) {
                 const receivedThreeDSServerTransID = JSON.parse(atob(data.threeDSMethodData)).threeDSServerTransID;
 
                 if (receivedThreeDSServerTransID === threeDSServerTransID) {
+                    notificationReceived = true;
                     console.log("3DS Notification received, proceeding to /details");
-                    const detailsRequest = { threeDSCompInd: "Y", paymentData: action.paymentData };
-                    const result = await makeDetails(detailsRequest);
-                    updatePaymentsLog("Details Response", result);
-                    handle3DSFlow(result);
-                    return;
+                    break;
                 }
             }
         } catch (error) {
@@ -191,8 +196,63 @@ async function listenFor3DSNotification(threeDSServerTransID, action) {
         await new Promise((resolve) => setTimeout(resolve, 1000)); 
     }
 
-    console.error("3DS notification not received in time");
+    // call details
+    sendDetailsRequest(action);
 }
+
+async function sendDetailsRequest(action) {
+    const threeDSCompInd = notificationReceived ? "Y" : "N";
+    const fingerprintData = JSON.stringify({ threeDSCompInd });
+    const fingerprintEncoded = btoa(fingerprintData)
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, ""); // Base64URL encoding
+
+    const detailsRequest = {
+        details: {
+            "threeds2.fingerprint": fingerprintEncoded
+        },
+        paymentData: action.paymentData
+    };
+
+    const result = await makeDetails(detailsRequest);
+    updatePaymentsLog("Details Response", result);
+    handle3DSFlow(result);
+}
+
+
+//// Listen to 3DS notifications
+//async function listenFor3DSNotification(threeDSServerTransID, action) {
+//    let attempts = 0;
+//    const maxAttempts = 10; 
+//
+//    while (attempts < maxAttempts) {
+//        try {
+//            const response = await fetch("/own-3ds/notification-check");
+//            const data = await response.json();
+//
+//            if (data.threeDSMethodData) {
+//                const receivedThreeDSServerTransID = JSON.parse(atob(data.threeDSMethodData)).threeDSServerTransID;
+//
+//                if (receivedThreeDSServerTransID === threeDSServerTransID) {
+//                    console.log("3DS Notification received, proceeding to /details");
+//                    const detailsRequest = { threeDSCompInd: "Y", paymentData: action.paymentData };
+//                    const result = await makeDetails(detailsRequest);
+//                    updatePaymentsLog("Details Response", result);
+//                    handle3DSFlow(result);
+//                    return;
+//                }
+//            }
+//        } catch (error) {
+//            console.error("Error checking 3DS notification", error);
+//        }
+//
+//        attempts++;
+//        await new Promise((resolve) => setTimeout(resolve, 1000)); 
+//    }
+//
+//    console.error("3DS notification not received in time");
+//}
 
 
 function showChallengeIframe(url, token) {

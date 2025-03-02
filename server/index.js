@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 let latestThreeDSMethodData = null;
 
 app.post("/own-3ds/notification", (req, res) => {
-    console.log("Raw 3DS notification body:", req.body); 
+    //console.log("Raw 3DS notification body:", req.body); 
 
     const threeDSMethodData = req.body.threeDSMethodData || (req.body && Object.keys(req.body)[0]);
 
