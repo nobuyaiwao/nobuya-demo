@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const reference = document.getElementById("reference").value;
         const returnUrl = document.getElementById("returnUrl").value || generateReturnUrl(reference);
         const nativeThreeDS = document.getElementById("nativeThreeDS").checked ? "preferred" : undefined;
+        const notificationURL = window.location.origin + "/own-3ds/notification";
         
         if (isNaN(value) || value <= 0) {
             console.error("Invalid amount value");
@@ -69,6 +70,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                         amount: { currency, value },
                         returnUrl,
                         channel: "Web",
+                        threeDS2RequestData: {
+                            notificationURL,
+                            threeDSCompInd:"Y"
+                        },
                         authenticationData: nativeThreeDS ? { threeDSRequestData: { nativeThreeDS } } : undefined
                     };
                     updatePaymentsLog("Payment Request", paymentData);
@@ -110,7 +115,8 @@ async function handle3DSFlow(result, component) {
             await initiate3DSFingerprinting(result.action);
             break;
         case "ChallengeShopper":
-            showChallengeIframe(result.action.url, atob(result.action.token));
+            console.log("Processing ChallengeShopper");
+            await initiate3DSChallenge(result.action);
             break;
         case "Authorised":
             document.getElementById("card-container").innerHTML = "<h2>Payment Successful</h2>";
@@ -220,46 +226,52 @@ async function sendDetailsRequest(action) {
     handle3DSFlow(result);
 }
 
+async function initiate3DSChallenge(action) {
+    if (!action || !action.token ) {
+        console.error("Invalid ChallengeShopper action", action);
+        return;
+    }
 
-//// Listen to 3DS notifications
-//async function listenFor3DSNotification(threeDSServerTransID, action) {
-//    let attempts = 0;
-//    const maxAttempts = 10; 
-//
-//    while (attempts < maxAttempts) {
-//        try {
-//            const response = await fetch("/own-3ds/notification-check");
-//            const data = await response.json();
-//
-//            if (data.threeDSMethodData) {
-//                const receivedThreeDSServerTransID = JSON.parse(atob(data.threeDSMethodData)).threeDSServerTransID;
-//
-//                if (receivedThreeDSServerTransID === threeDSServerTransID) {
-//                    console.log("3DS Notification received, proceeding to /details");
-//                    const detailsRequest = { threeDSCompInd: "Y", paymentData: action.paymentData };
-//                    const result = await makeDetails(detailsRequest);
-//                    updatePaymentsLog("Details Response", result);
-//                    handle3DSFlow(result);
-//                    return;
-//                }
-//            }
-//        } catch (error) {
-//            console.error("Error checking 3DS notification", error);
-//        }
-//
-//        attempts++;
-//        await new Promise((resolve) => setTimeout(resolve, 1000)); 
-//    }
-//
-//    console.error("3DS notification not received in time");
-//}
+    const decodedToken = JSON.parse(atob(action.token));
+    
+    const cReqData = {
+        threeDSServerTransID: decodedToken['threeDSServerTransID'],
+        acsTransID: decodedToken['acsTransID'],
+        messageVersion: decodedToken['messageVersion'],
+        challengeWindowSize: '05',
+        messageType: 'CReq'
+    };
+    
+    const stringifiedDataObject = JSON.stringify(cReqData);
+    const encodedcReq = btoa(stringifiedDataObject)
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
 
-
-function showChallengeIframe(url, token) {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = decodedToken.acsURL;
+    form.id = "3dschallenge";
+    form.target = "threeDSChallengeIframe";
+    
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "creq";
+    input.value = encodedcReq;
+    form.appendChild(input);
+    
     const iframe = document.createElement("iframe");
-    iframe.src = url;
+    iframe.name = "threeDSChallengeIframe";
     iframe.style.width = "100%";
     iframe.style.height = "400px";
-    document.getElementById("card-container").appendChild(iframe);
+    iframe.style.border = "none";
+    
+    const challengeContainer = document.getElementById("card-container");
+    challengeContainer.innerHTML = "";
+    challengeContainer.appendChild(iframe);
+    challengeContainer.appendChild(form);
+    
+    form.submit();
+    console.log("3DS Challenge Initiated");
 }
 
