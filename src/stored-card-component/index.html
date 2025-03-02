@@ -41,6 +41,19 @@
 
                 <label for="shopperReference">Shopper Reference:</label>
                 <input type="text" id="shopperReference" value="nobuya-demo-user" placeholder="Enter shopper ID">
+
+               <label class="switch">
+                    <input type="checkbox" id="nativeThreeDS" checked>
+                    <span class="slider round"></span>
+                </label> 
+
+                <label for="recurringProcessingModel">Recurring Model:</label>
+                <select id="recurringProcessingModel">
+                    <option value="CardOnFile" selected>Card On File</option>
+                    <option value="Subscription">Subscription</option>
+                    <option value="UnscheduledCardOnFile">Unscheduled Card On File</option>
+                </select>
+
             </div>
             <button id="start-payment">Here we go!</button>
             <div id="stored-card-container"></div>

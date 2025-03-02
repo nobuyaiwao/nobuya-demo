@@ -39,8 +39,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         const value = parseInt(document.getElementById("amount")?.value || "5000", 10);
         const reference = document.getElementById("reference")?.value;
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
+        const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
         const origin = window.location.origin;
         const shopperReference = document.getElementById("shopperReference")?.value || "guest";
+        const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
 
         if (isNaN(value) || value <= 0) {
             console.error("Invalid amount value. Please enter a valid number.");
@@ -93,6 +95,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                             reference,
                             amount: { currency, value },
                             shopperReference,
+                            recurringProcessingModel,
+                            ...(nativeThreeDS && {
+                                authenticationData: {
+                                    threeDSRequestData: {
+                                        nativeThreeDS
+                                    }
+                                }
+                            }),
                             returnUrl,
                             origin,
                             channel: "Web"
@@ -138,6 +148,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                         console.error("Additional details processing error:", error);
                         actions.reject();
                     }
+                },
+                onPaymentCompleted: async (result, component) => {
+
+                    console.log("### card::onPaymentCompleted:: calling");
+                    console.log(result);
+
+                    const cardContainer = document.getElementById("stored-card-container");
+                    cardContainer.innerHTML = `
+                        <h2>Payment Result</h2>
+                        <p><strong>Status:</strong> ${result.resultCode}</p>
+                    `;
+
                 }
             };
 
