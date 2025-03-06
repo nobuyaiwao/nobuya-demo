@@ -85,7 +85,28 @@ document.addEventListener("DOMContentLoaded", async () => {
                     value,
                     currency,
                 },
-                countryCode
+                countryCode,
+                requiredShippingContactFields: [ "postalAddress" ],
+                onClick: (resolve,reject) => {
+                    console.log("onClick is called :)");
+                    resolve();
+                },
+                onShippingContactSelected: async (resolve, reject, event) => {
+                    console.log("onShippingContactSelected called.");
+                    await console.log(event);
+
+                    if ( event ) {
+                        return resolve({
+                          newTotal: {
+                            label: "Total",
+                            amount: "10",
+                            type: "final",
+                          }
+                        });
+                    } else {
+                        reject();
+                    }
+                }
             };
 
             const configObj = {
