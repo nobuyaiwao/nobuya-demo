@@ -157,34 +157,51 @@ export const updatePaymentsLog = (type, data) => {
 };
 
 // 🔹 Update the console container (debug console)
-export const updateConsoleContainer = (message) => {
+export const updateConsoleContainer = (message, type = "log") => {
     const consoleContainer = document.getElementById("console-container");
     if (consoleContainer) {
         const logEntry = document.createElement("div");
-        
-        // タイムスタンプを生成
+
         const timestamp = new Date().toLocaleTimeString("ja-JP", { hour12: false });
 
-        // ログのフォーマット
+        if (type === "error") {
+            logEntry.style.color = "red";
+        }
+
         logEntry.textContent = `[${timestamp}] ${message}`;
         logEntry.style.whiteSpace = "pre-wrap"; // 長いログを折り返す
 
         consoleContainer.appendChild(logEntry);
 
-        // スクロールを下に自動で移動
         consoleContainer.scrollTop = consoleContainer.scrollHeight;
     }
 };
 
-// 🔹 Override console.log() to log to the right panel with timestamp
+// 🔹 Override console.log() and console.error()
 export const overrideConsoleLog = () => {
     const originalConsoleLog = console.log;
     console.log = (...args) => {
-        originalConsoleLog(...args); // 元の console.log() も動作
-
-        // 各引数を JSON 文字列化して結合
+        originalConsoleLog(...args); 
         const logMessage = args.map(arg => JSON.stringify(arg, null, 2)).join(" ");
-        updateConsoleContainer(logMessage);
+        updateConsoleContainer(logMessage, "log");
     };
+
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+        originalConsoleError(...args); 
+        const logMessage = args.map(arg => (arg instanceof Error ? arg.stack : JSON.stringify(arg, null, 2))).join(" ");
+        updateConsoleContainer(logMessage, "error");
+    };
+};
+
+// 🔹 Global error handler for uncaught errors
+export const setupGlobalErrorHandler = () => {
+    window.addEventListener("error", (event) => {
+        console.error(`Uncaught Error: ${event.message}\nSource: ${event.filename}:${event.lineno}:${event.colno}\nStack:\n${event.error?.stack || "N/A"}`);
+    });
+
+    window.addEventListener("unhandledrejection", (event) => {
+        console.error(`Unhandled Promise Rejection: ${event.reason?.message || event.reason}\nStack:\n${event.reason?.stack || "N/A"}`);
+    });
 };
 

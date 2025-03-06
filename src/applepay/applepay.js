@@ -8,12 +8,14 @@ import {
     generateReference,
     generateReturnUrl,
     handleTestCardCopying,
-    overrideConsoleLog
+    overrideConsoleLog,
+    setupGlobalErrorHandler
 } from "../util.js";
 
-// Console.log override
+// Coonsole override
 document.addEventListener("DOMContentLoaded", () => {
     overrideConsoleLog(); 
+    setupGlobalErrorHandler(); 
 });
 
 // 🔹 Enable test card copying
