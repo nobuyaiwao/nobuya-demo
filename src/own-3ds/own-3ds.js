@@ -7,8 +7,16 @@ import {
     updatePaymentsLog,
     generateReference,
     generateReturnUrl,
-    handleTestCardCopying
+    handleTestCardCopying,
+    overrideConsoleLog,
+    setupGlobalErrorHandler
 } from "../util.js";
+
+// Coonsole override
+document.addEventListener("DOMContentLoaded", () => {
+    overrideConsoleLog();
+    setupGlobalErrorHandler();
+});
 
 handleTestCardCopying();
 
