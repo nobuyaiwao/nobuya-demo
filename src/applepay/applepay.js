@@ -7,8 +7,14 @@ import {
     updatePaymentsLog,
     generateReference,
     generateReturnUrl,
-    handleTestCardCopying
+    handleTestCardCopying,
+    overrideConsoleLog
 } from "../util.js";
+
+// Console.log override
+document.addEventListener("DOMContentLoaded", () => {
+    overrideConsoleLog(); 
+});
 
 // 🔹 Enable test card copying
 handleTestCardCopying();

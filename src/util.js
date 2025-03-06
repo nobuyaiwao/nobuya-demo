@@ -156,89 +156,35 @@ export const updatePaymentsLog = (type, data) => {
     paymentsContainer.textContent = logEntry + paymentsContainer.textContent;
 };
 
+// 🔹 Update the console container (debug console)
+export const updateConsoleContainer = (message) => {
+    const consoleContainer = document.getElementById("console-container");
+    if (consoleContainer) {
+        const logEntry = document.createElement("div");
+        
+        // タイムスタンプを生成
+        const timestamp = new Date().toLocaleTimeString("ja-JP", { hour12: false });
 
+        // ログのフォーマット
+        logEntry.textContent = `[${timestamp}] ${message}`;
+        logEntry.style.whiteSpace = "pre-wrap"; // 長いログを折り返す
 
-//// 🔹 Process the payment request
-//export const makePayment = async (paymentData) => {
-//    console.log("Processing payment:", paymentData);
-//
-//    try {
-//        // 🔹 Log the request before sending
-//        updatePaymentsLog("Payment Request", paymentData);
-//
-//        const response = await fetch("/api/payments", {
-//            method: "POST",
-//            headers: { "Content-Type": "application/json" },
-//            body: JSON.stringify(paymentData),
-//        });
-//
-//        const responseData = await response.json();
-//        console.log("Payment response:", responseData);
-//
-//        // 🔹 Log the response after receiving
-//        updatePaymentsLog("Payment Response", responseData);
-//
-//        return responseData;
-//
-//    } catch (error) {
-//        console.error("Error processing payment:", error);
-//
-//        // 🔹 Log the error
-//        updatePaymentsLog("Payment Error", { error: error.message });
-//
-//        return { error: "Payment failed" };
-//    }
-//};
-//
-////// 🔹 Handle additional payment details (3DS, etc.)
-////export const handleAdditionalDetails = async (details) => {
-////    console.log("Handling additional details:", details);
-////    // TODO: Implement API call to /api/paymentDetails
-////    return { resultCode: "Authorised" };
-////};
-//
-//// 
-//export const makeDetails = async (detailsData) => {
-//    console.log("Processing additional details:", detailsData);
-//
-//    try {
-//        updatePaymentsLog("Details Request", detailsData);
-//
-//        const response = await fetch("/api/payments/details", {
-//            method: "POST",
-//            headers: { "Content-Type": "application/json" },
-//            body: JSON.stringify(detailsData),
-//        });
-//
-//        const responseData = await response.json();
-//        console.log("Details response:", responseData);
-//
-//        updatePaymentsLog("Details Response", responseData);
-//        return responseData;
-//    } catch (error) {
-//        console.error("Error processing additional details:", error);
-//        updatePaymentsLog("Details Error", { error: error.message });
-//        return { error: "Details processing failed" };
-//    }
-//};
-//
-//
-//// 🔹 Update the state container (debug console)
-//export const updateStateContainer = (state) => {
-//    const stateContainer = document.getElementById("state-container");
-//    if (stateContainer) {
-//        stateContainer.textContent = JSON.stringify(state, null, 2);
-//    }
-//};
-//
-//// 🔹 Update the payments log in the debug console
-//export const updatePaymentsLog = (type, data) => {
-//    const paymentsContainer = document.getElementById("payments-container");
-//    if (!paymentsContainer) return;
-//
-//    const timestamp = new Date().toLocaleTimeString();
-//    const logEntry = `[${timestamp}] ${type}:\n${JSON.stringify(data, null, 2)}\n\n`;
-//
-//    paymentsContainer.textContent = logEntry + paymentsContainer.textContent;
-//};
-//
+        consoleContainer.appendChild(logEntry);
+
+        // スクロールを下に自動で移動
+        consoleContainer.scrollTop = consoleContainer.scrollHeight;
+    }
+};
+
+// 🔹 Override console.log() to log to the right panel with timestamp
+export const overrideConsoleLog = () => {
+    const originalConsoleLog = console.log;
+    console.log = (...args) => {
+        originalConsoleLog(...args); // 元の console.log() も動作
+
+        // 各引数を JSON 文字列化して結合
+        const logMessage = args.map(arg => JSON.stringify(arg, null, 2)).join(" ");
+        updateConsoleContainer(logMessage);
+    };
+};
+
