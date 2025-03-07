@@ -62,14 +62,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!config) throw new Error("Failed to load client config");
 
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
-            paymentMethodsResponse.storedPaymentMethods.forEach(method => {
-                if (method.supportedRecurringProcessingModels) {
-                    method.supportedRecurringProcessingModels = ["CardOnFile"];
-                }
-                if (method.supportedShopperInteractions) {
-                    method.supportedShopperInteractions = ["Ecommerce"];
-                }
-            });
+            //paymentMethodsResponse.storedPaymentMethods.forEach(method => {
+            //    if (method.supportedRecurringProcessingModels) {
+            //        method.supportedRecurringProcessingModels = ["CardOnFile"];
+            //    }
+            //    if (method.supportedShopperInteractions) {
+            //        method.supportedShopperInteractions = ["Ecommerce"];
+            //    }
+            //});
 
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 

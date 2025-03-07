@@ -48,6 +48,18 @@
                 </label>
 
                 <div class="input-group">
+                    <label for="threeDSRequestorChallengeInd">Challenge Ind.:</label>
+                    <select id="threeDSRequestorChallengeInd">
+                        <option value="01" selected>No Preference</option>
+                        <option value="02">No Challenge Requested</option>
+                        <option value="03">Challenge Requested(3DS Requester Preference)</option>
+                        <option value="04">Challenge Requested(Mandate)</option>
+                        <option value="05">No Challenge</option>
+                        <option value="06">Data Only</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
                     <label for="shopperReference">Shopper Reference:</label>
                     <input type="text" id="shopperReference" value="nobuya-demo-user" placeholder="Enter shopper ID">
                     <label for="recurringProcessingModel">Recurring Model:</label>

@@ -52,6 +52,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         const reference = document.getElementById("reference").value;
         const returnUrl = document.getElementById("returnUrl").value || generateReturnUrl(reference);
         const nativeThreeDS = document.getElementById("nativeThreeDS").checked ? "preferred" : undefined;
+        const threeDSRequestorChallengeInd = document.getElementById("threeDSRequestorChallengeInd").value;
+        const shopperReference = document.getElementById("shopperReference").value;
+        const recurringProcessingModel = document.getElementById("recurringProcessingModel").value;
         const notificationURL = window.location.origin + "/own-3ds/notification";
         
         if (isNaN(value) || value <= 0) {
@@ -78,7 +81,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                         amount: { currency, value },
                         returnUrl,
                         channel: "Web",
-                        threeDS2RequestData: { notificationURL },
+                        shopperReference,
+                        recurringProcessingModel,
+                        threeDS2RequestData: { 
+                            notificationURL,
+                            threeDSRequestorChallengeInd
+                        },
                         authenticationData: nativeThreeDS ? { threeDSRequestData: { nativeThreeDS } } : undefined
                     };
                     updatePaymentsLog("Payment Request", paymentData);
