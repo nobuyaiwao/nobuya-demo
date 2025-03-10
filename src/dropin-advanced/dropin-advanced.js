@@ -178,8 +178,9 @@ document.addEventListener("DOMContentLoaded", () => {
                                     }
                                 }
                             }),
-                            storePaymentMethod: true,       // ??
-                            recurringProcessingModel
+                            //storePaymentMethod: true,       // ??
+                            recurringProcessingModel,
+                            ...(state.data.paymentMethod?.storedPaymentMethodId && { shopperInteraction: "ContAuth" })
                         };
 
                         const { action, resultCode } = await makePayment(paymentsReqData);
