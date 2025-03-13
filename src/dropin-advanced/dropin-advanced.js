@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 onShippingContactSelected: async (resolve, reject, event) => {
                     console.log("onShippingContactSelected called.");
                     console.log("Shipping Contact Data:", event.shippingContact);
-            
+                
                     // 住所情報の取得
                     const shippingContact = event.shippingContact;
                     const shippingAddress = {
@@ -159,13 +159,18 @@ document.addEventListener("DOMContentLoaded", () => {
                         addressLine1: shippingContact.addressLines ? shippingContact.addressLines[0] : "",
                         addressLine2: shippingContact.addressLines ? shippingContact.addressLines[1] : "",
                     };
-            
+                
                     console.log("Extracted Shipping Address:", shippingAddress);
-            
-                    // 取得した住所をHTMLに反映 (デバッグ用)
-                    document.getElementById("shippingAddressOutput").innerText = JSON.stringify(shippingAddress, null, 2);
-            
-                    // Apple Pay の UI を更新 (例えば、送料を変更)
+                
+                    // HTML要素が存在する場合のみ表示
+                    const shippingOutputElement = document.getElementById("shippingAddressOutput");
+                    if (shippingOutputElement) {
+                        shippingOutputElement.innerText = JSON.stringify(shippingAddress, null, 2);
+                    } else {
+                        console.warn("shippingAddressOutput element not found in DOM.");
+                    }
+                
+                    // Apple Pay の UI を更新
                     resolve({
                         newTotal: {
                             label: "Total",
@@ -174,6 +179,35 @@ document.addEventListener("DOMContentLoaded", () => {
                         },
                     });
                 }
+                
+                //onShippingContactSelected: async (resolve, reject, event) => {
+                //    console.log("onShippingContactSelected called.");
+                //    console.log("Shipping Contact Data:", event.shippingContact);
+            
+                //    // 住所情報の取得
+                //    const shippingContact = event.shippingContact;
+                //    const shippingAddress = {
+                //        country: shippingContact.countryCode,
+                //        city: shippingContact.locality,
+                //        postalCode: shippingContact.postalCode,
+                //        addressLine1: shippingContact.addressLines ? shippingContact.addressLines[0] : "",
+                //        addressLine2: shippingContact.addressLines ? shippingContact.addressLines[1] : "",
+                //    };
+            
+                //    console.log("Extracted Shipping Address:", shippingAddress);
+            
+                //    // 取得した住所をHTMLに反映 (デバッグ用)
+                //    document.getElementById("shippingAddressOutput").innerText = JSON.stringify(shippingAddress, null, 2);
+            
+                //    // Apple Pay の UI を更新 (例えば、送料を変更)
+                //    resolve({
+                //        newTotal: {
+                //            label: "Total",
+                //            amount: `${value}`,
+                //            type: "final",
+                //        },
+                //    });
+                //}
             };
 
             // dropin configuration
