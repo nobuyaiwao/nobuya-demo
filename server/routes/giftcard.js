@@ -28,6 +28,7 @@ router.post("/balance", async (req, res) => {
 
         const balanceRequest = {
             ...req.body,
+            amount: req.body.amount || { currency: "USD", value: 2000 }, // 🔹 デフォルト値を設定
             merchantAccount: process.env.ADYEN_MERCHANT_ACCOUNT
         };
 

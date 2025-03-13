@@ -63,19 +63,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
-            const checkout = await AdyenCheckout({
+            // 🔹 Checkout の設定をまとめる
+            const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
                 locale: "ja-JP",
                 environment: config.environment,
                 countryCode,
-                onChange: updateStateContainer,
-            });
+                onChange: updateStateContainer
+            };
 
-            const giftcardComponent = checkout.create("giftcard", {
+            // 🔹 Giftcard の設定
+            const giftcardConfiguration = {
                 onBalanceCheck: async (resolve, reject, data) => {
                     console.log("Checking balance:", data);
-
                     try {
                         const response = await fetch("/api/balance", {
                             method: "POST",
@@ -87,7 +88,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                         const balanceData = await response.json();
                         console.log("Balance Response:", balanceData);
-
                         resolve(balanceData);
                     } catch (error) {
                         console.error("Balance check failed:", error);
@@ -97,7 +97,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 onOrderRequest: async (resolve, reject, data) => {
                     console.log("Creating order:", data);
-
                     try {
                         const response = await fetch("/api/orders", {
                             method: "POST",
@@ -109,7 +108,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                         const orderData = await response.json();
                         console.log("Order Response:", orderData);
-
                         resolve(orderData);
                     } catch (error) {
                         console.error("Order creation failed:", error);
@@ -119,7 +117,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 onOrderCancel: async (order) => {
                     console.log("Cancelling order:", order);
-
                     try {
                         const response = await fetch("/api/orders/cancel", {
                             method: "POST",
@@ -146,7 +143,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             shopperReference,
                             returnUrl,
                             origin,
-                            channel: "Web",
+                            channel: "Web"
                         };
 
                         updatePaymentsLog("Payment Request", paymentsReqData);
@@ -159,8 +156,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             return;
                         }
 
-                        const { resultCode, action } = result;
-                        actions.resolve({ resultCode, action });
+                        actions.resolve({ resultCode: result.resultCode, action: result.action });
                     } catch (error) {
                         console.error("Payment error:", error);
                         actions.reject();
@@ -197,9 +193,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <p><strong>Status:</strong> ${result.resultCode}</p>
                     `;
                 }
-            });
+            };
 
-            giftcardComponent.mount("#giftcard-container");
+            // 🔹 Checkout と Giftcard Component の作成
+            const { AdyenCheckout, Giftcard } = window.AdyenWeb;
+            const checkout = await AdyenCheckout(configObj);
+            const giftcardComponent = new Giftcard(checkout, giftcardConfiguration);
+
+            giftcardComponent.isAvailable()
+                .then(() => {
+                    giftcardComponent.mount("#giftcard-container");
+                })
+                .catch(e => {
+                    console.error("Giftcard is not available:", e);
+                });
 
         } catch (error) {
             console.error("Error during initialization:", error);
