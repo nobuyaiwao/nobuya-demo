@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             //        });
             //    }
             //};
-            const applePayConfiguration = {
+            const applepayConfiguration = {
                 amount: {
                     value,
                     currency,
