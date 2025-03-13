@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
             // Apple Pay configuration with shipping address collection
-            const applePayConfiguration = {
+            const applepayConfiguration = {
                 amount: {
                     value,
                     currency,
@@ -271,7 +271,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Initiate AdyenCheckout with global configuration
             const checkout = await AdyenCheckout(configObj);
             // Create component object to mount to DOM
-            const applePayComponent = new ApplePay(checkout, applePayConfiguration);
+            const applePayComponent = new ApplePay(checkout, applepayConfiguration);
 
             applePayComponent
                .isAvailable()
