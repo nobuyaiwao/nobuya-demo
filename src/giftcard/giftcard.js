@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
 
         console.log("Payment request configuration:", pmReqConfig);
+        console.log("currency : ", currency);
 
         try {
             const config = await getClientConfig();
@@ -63,11 +64,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
-            // 🔹 Checkout の設定をまとめる
+            // 
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                locale: "ja-JP",
+                locale: "en-US",
+                amount: { currency, value },
                 environment: config.environment,
                 countryCode,
                 onChange: updateStateContainer
