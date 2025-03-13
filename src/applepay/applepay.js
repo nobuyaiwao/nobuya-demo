@@ -135,38 +135,28 @@ document.addEventListener("DOMContentLoaded", async () => {
                             type: "final",
                         },
                     });
+                },
+                onPaymentAuthorized: async (resolve, reject, event) => {
+                    console.log("### onPaymentAuthorized called ###");
+                    console.log("Full Payment Authorization Event:", event);
+                
+                    // Payment Data from Apple
+                    const paymentData = event.payment;
+                
+                    console.log("Payment Token:", paymentData.token);
+                    console.log("Transaction Identifier:", paymentData.transactionIdentifier);
+                    console.log("Billing Contact:", paymentData.billingContact);
+                    console.log("Shipping Contact:", paymentData.shippingContact);
+                
+                    // Debug
+                    console.log("Full Payment Data (JSON):", JSON.stringify(paymentData, null, 2));
+                
+                    // Resolve
+                    resolve({
+                        status: ApplePaySession.STATUS_SUCCESS
+                    });
                 }
             };
-
-            // Payment Method Specific Configuration
-            //const applePayConfiguration = {
-            //    amount: {
-            //        value,
-            //        currency,
-            //    },
-            //    countryCode,
-            //    requiredShippingContactFields: [ "postalAddress" ],
-            //    onClick: (resolve,reject) => {
-            //        console.log("onClick is called :)");
-            //        resolve();
-            //    },
-            //    onShippingContactSelected: async (resolve, reject, event) => {
-            //        console.log("onShippingContactSelected called.");
-            //        await console.log(event);
-
-            //        if ( event ) {
-            //            return resolve({
-            //              newTotal: {
-            //                label: "Total",
-            //                amount: "10",
-            //                type: "final",
-            //              }
-            //            });
-            //        } else {
-            //            reject();
-            //        }
-            //    }
-            //};
 
             const configObj = {
                 // Global Configuration
