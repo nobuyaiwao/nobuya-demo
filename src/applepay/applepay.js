@@ -87,35 +87,86 @@ document.addEventListener("DOMContentLoaded", async () => {
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
-            // Payment Method Specific Configuration
+            // Apple Pay configuration with shipping address collection
             const applePayConfiguration = {
                 amount: {
                     value,
                     currency,
                 },
                 countryCode,
-                requiredShippingContactFields: [ "postalAddress" ],
-                onClick: (resolve,reject) => {
+                isExpress: true,
+                requiredShippingContactFields: ["postalAddress"],
+                onClick: (resolve, reject) => {
                     console.log("onClick is called :)");
                     resolve();
                 },
                 onShippingContactSelected: async (resolve, reject, event) => {
                     console.log("onShippingContactSelected called.");
-                    await console.log(event);
-
-                    if ( event ) {
-                        return resolve({
-                          newTotal: {
-                            label: "Total",
-                            amount: "10",
-                            type: "final",
-                          }
-                        });
+                    console.log("Shipping Contact Data:", event.shippingContact);
+            
+                    // 住所情報の取得
+                    const shippingContact = event.shippingContact;
+                    const shippingAddress = {
+                        country: shippingContact.countryCode,
+                        city: shippingContact.locality,
+                        postalCode: shippingContact.postalCode,
+                        addressLine1: shippingContact.addressLines ? shippingContact.addressLines[0] : "",
+                        addressLine2: shippingContact.addressLines ? shippingContact.addressLines[1] : "",
+                    };
+            
+                    console.log("Extracted Shipping Address:", shippingAddress);
+            
+                    // HTML要素を取得
+                    const shippingOutputElement = document.getElementById("shippingAddressOutput");
+            
+                    if (shippingOutputElement) {
+                        shippingOutputElement.style.display = "block";
+                        // 住所情報を表示
+                        shippingOutputElement.innerText = JSON.stringify(shippingAddress, null, 2);
                     } else {
-                        reject();
+                        console.warn("shippingAddressOutput element not found in DOM.");
                     }
+            
+                    // Apple Pay の UI を更新
+                    resolve({
+                        newTotal: {
+                            label: "Total",
+                            amount: `${value}`,
+                            type: "final",
+                        },
+                    });
                 }
             };
+
+            // Payment Method Specific Configuration
+            //const applePayConfiguration = {
+            //    amount: {
+            //        value,
+            //        currency,
+            //    },
+            //    countryCode,
+            //    requiredShippingContactFields: [ "postalAddress" ],
+            //    onClick: (resolve,reject) => {
+            //        console.log("onClick is called :)");
+            //        resolve();
+            //    },
+            //    onShippingContactSelected: async (resolve, reject, event) => {
+            //        console.log("onShippingContactSelected called.");
+            //        await console.log(event);
+
+            //        if ( event ) {
+            //            return resolve({
+            //              newTotal: {
+            //                label: "Total",
+            //                amount: "10",
+            //                type: "final",
+            //              }
+            //            });
+            //        } else {
+            //            reject();
+            //        }
+            //    }
+            //};
 
             const configObj = {
                 // Global Configuration
