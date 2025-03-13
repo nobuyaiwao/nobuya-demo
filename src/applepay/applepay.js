@@ -87,83 +87,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
-            // Apple Pay configuration with shipping address collection
-            //const applepayConfiguration = {
-            //    amount: {
-            //        value,
-            //        currency,
-            //    },
-            //    countryCode,
-            //    isExpress: true,
-            //    requiredShippingContactFields: ["postalAddress"],
-            //    onClick: (resolve, reject) => {
-            //        console.log("onClick is called :)");
-            //        resolve();
-            //    },
-            //    onShippingContactSelected: async (resolve, reject, event) => {
-            //        console.log("onShippingContactSelected called.");
-            //        console.log("Shipping Contact Data:", event.shippingContact);
-            //
-            //        // 住所情報の取得
-            //        const shippingContact = event.shippingContact;
-            //        const shippingAddress = {
-            //            country: shippingContact.countryCode,
-            //            city: shippingContact.locality,
-            //            postalCode: shippingContact.postalCode,
-            //            addressLine1: shippingContact.addressLines ? shippingContact.addressLines[0] : "",
-            //            addressLine2: shippingContact.addressLines ? shippingContact.addressLines[1] : "",
-            //        };
-            //
-            //        console.log("Extracted Shipping Address:", shippingAddress);
-            //
-            //        // HTML要素を取得
-            //        const shippingOutputElement = document.getElementById("shippingAddressOutput");
-            //
-            //        if (shippingOutputElement) {
-            //            shippingOutputElement.style.display = "block";
-            //            // 住所情報を表示
-            //            shippingOutputElement.innerText = JSON.stringify(shippingAddress, null, 2);
-            //        } else {
-            //            console.warn("shippingAddressOutput element not found in DOM.");
-            //        }
-            //
-            //        // Apple Pay の UI を更新
-            //        resolve({
-            //            newTotal: {
-            //                label: "Total",
-            //                amount: `${value}`,
-            //                type: "final",
-            //            },
-            //        });
-            //    },
-            //    onPaymentAuthorized: async (resolve, reject, event) => {
-            //        console.log("### onPaymentAuthorized called ###");
-            //        console.log("Full Payment Authorization Event:", event);
-            //    
-            //        // Payment Data from Apple
-            //        const paymentData = event.payment;
-            //    
-            //        console.log("Payment Token:", paymentData.token);
-            //        console.log("Transaction Identifier:", paymentData.transactionIdentifier);
-            //        console.log("Billing Contact:", paymentData.billingContact);
-            //        console.log("Shipping Contact:", paymentData.shippingContact);
-            //    
-            //        // Debug
-            //        console.log("Full Payment Data (JSON):", JSON.stringify(paymentData, null, 2));
-            //    
-            //        // Resolve
-            //        resolve({
-            //            status: ApplePaySession.STATUS_SUCCESS
-            //        });
-            //    }
-            //};
             const applepayConfiguration = {
                 amount: {
                     value,
                     currency,
                 },
                 countryCode,
-                isExpress: true,
+                isExpress: false,
                 requiredShippingContactFields: ["postalAddress"],
                 onClick: (resolve, reject) => {
                     console.log("onClick is called :)");
