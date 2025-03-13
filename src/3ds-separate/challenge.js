@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             environment: config.environment,
             onAdditionalDetails: async (state, component, actions) => {
                 console.log("### challenge::onAdditionalDetails:: calling");
+                console.log("### challenge::state.data", JSON.stringify(state.data, null, 2));
                 
                 try {
                     updatePaymentsLog("Details Request", state.data);
@@ -49,15 +50,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         console.error("3DS Challenge failed: Missing resultCode.");
                         return;
                     }
-
-                    //console.log("Handling additional details:", { resultCode, action, order, donationToken });
-
-                    //actions.resolve({
-                    //    resultCode,
-                    //    action,
-                    //    order,
-                    //    donationToken,
-                    //});
 
                     console.log("Challenge completed, redirecting back...");
                     window.location.href = `index.html?redirectResult=${encodeURIComponent(result.resultCode)}`;
