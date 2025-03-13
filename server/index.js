@@ -49,6 +49,11 @@ app.get("/own-3ds/notification-check", (req, res) => {
 });
 
 
+// Giftcard
+const giftcardRoutes = require("./routes/giftcard");
+app.use("/api", giftcardRoutes);
+
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
