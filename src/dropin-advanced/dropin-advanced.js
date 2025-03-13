@@ -140,15 +140,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 enableStoreDetails: true
             };
 
-            // Apple Pay configuration
-            //const applepayConfiguration = {
-            //    countryCode,
-            //    amount: { currency, value }
-            //};
             // Apple Pay configuration with shipping address collection
             const applepayConfiguration = {
                 countryCode,
                 amount: { currency, value },
+                isExpress: true,
                 requiredShippingContactFields: ["postalAddress"], // 住所情報を取得
                 onShippingContactSelected: async (resolve, reject, event) => {
                     console.log("onShippingContactSelected called.");
