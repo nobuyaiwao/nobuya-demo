@@ -141,9 +141,43 @@ document.addEventListener("DOMContentLoaded", () => {
             };
 
             // Apple Pay configuration
+            //const applepayConfiguration = {
+            //    countryCode,
+            //    amount: { currency, value }
+            //};
+            // Apple Pay configuration with shipping address collection
             const applepayConfiguration = {
                 countryCode,
-                amount: { currency, value }
+                amount: { currency, value },
+                requiredShippingContactFields: ["postalAddress"], // 住所情報を取得
+                onShippingContactSelected: async (resolve, reject, event) => {
+                    console.log("onShippingContactSelected called.");
+                    console.log("Shipping Contact Data:", event.shippingContact);
+            
+                    // 住所情報の取得
+                    const shippingContact = event.shippingContact;
+                    const shippingAddress = {
+                        country: shippingContact.countryCode,
+                        city: shippingContact.locality,
+                        postalCode: shippingContact.postalCode,
+                        addressLine1: shippingContact.addressLines ? shippingContact.addressLines[0] : "",
+                        addressLine2: shippingContact.addressLines ? shippingContact.addressLines[1] : "",
+                    };
+            
+                    console.log("Extracted Shipping Address:", shippingAddress);
+            
+                    // 取得した住所をHTMLに反映 (デバッグ用)
+                    document.getElementById("shippingAddressOutput").innerText = JSON.stringify(shippingAddress, null, 2);
+            
+                    // Apple Pay の UI を更新 (例えば、送料を変更)
+                    resolve({
+                        newTotal: {
+                            label: "Total",
+                            amount: `${value}`,
+                            type: "final",
+                        },
+                    });
+                }
             };
 
             // dropin configuration
