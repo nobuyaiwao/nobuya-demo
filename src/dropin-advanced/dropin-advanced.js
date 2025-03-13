@@ -140,13 +140,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 enableStoreDetails: true
             };
 
+            // Apple Pay configuration
+            const applepayConfiguration = {
+                countryCode,
+                amount: { currency, value }
+            };
+
             // dropin configuration
             const dropinConfiguration = {
                 //paymentMethodComponents: [Card, PayPal, GooglePay, ApplePay, Ideal],
                 instantPaymentTypes: ['applepay', 'googlepay'],
                 //showPaymentMethods: false,
                 paymentMethodsConfiguration : {
-                    card : cardConfiguration
+                    card : cardConfiguration,
+                    applepay : applepayConfiguration
                 }
             };
 
