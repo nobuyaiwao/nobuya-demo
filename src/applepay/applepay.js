@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     currency,
                 },
                 countryCode,
-                isExpress: false,
+                isExpress: true,
                 requiredShippingContactFields: ["postalAddress"],
                 onClick: (resolve, reject) => {
                     console.log("onClick is called :)");
