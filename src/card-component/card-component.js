@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const shopperReference = document.getElementById("shopperReference")?.value || "guest";
         const shopperEmail = document.getElementById("shopperEmail")?.value || "test@example.com";
         const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
+        const challengeWindowSize = document.getElementById("challengeWindowSize")?.value || "02";
 
         if (isNaN(value) || value <= 0) {
             console.error("Invalid amount value. Please enter a valid number.");
@@ -90,12 +91,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Card component configuration
             const cardConfiguration = {
-                hasHolderName: true,
+                hasHolderName: false,
                 enableStoreDetails: true,
                 clickToPayConfiguration: {
                     "merchantDisplayName" : "CTP Merchant Name",
                     shopperEmail
-                }
+                },
+                challengeWindowSize
             };
             console.log("Card Configuration:", cardConfiguration);
 
