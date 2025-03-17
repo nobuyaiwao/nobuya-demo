@@ -6,6 +6,7 @@ const router = express.Router();
 
 // Get API version from environment variables (default to v71)
 const API_VERSION = process.env.API_VERSION || "v71";
+console.log(`process.env.ADYEN_ENVIRONMENT: ${process.env.ADYEN_ENVIRONMENT}`);
 
 // Determine the Adyen API endpoint based on environment
 let ADYEN_API_URL;

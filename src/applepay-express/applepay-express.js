@@ -7,11 +7,24 @@ import {
     updatePaymentsLog,
     generateReference,
     generateReturnUrl,
-    handleTestCardCopying
+    handleTestCardCopying,
+    overrideConsoleLog,
+    setupGlobalErrorHandler
 } from "../util.js";
+
+// Coonsole override
+document.addEventListener("DOMContentLoaded", () => {
+    overrideConsoleLog(); 
+    setupGlobalErrorHandler(); 
+});
 
 // 🔹 Enable test card copying
 handleTestCardCopying();
+
+if (window.location.protocol !== "https:") {
+    alert("Warning : You need HTTPS to run Apple Pay component. With this code you can run on Heroku alternatively.");
+}
+
 
 // 🔹 Function to get URL query parameters
 const getQueryParam = (param) => {
@@ -52,7 +65,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
         const origin = window.location.origin;
         const shopperReference = document.getElementById("shopperReference")?.value || "guest";
-        const shopperEmail = document.getElementById("shopperEmail")?.value || "test@example.com";
         const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
 
         if (isNaN(value) || value <= 0) {
@@ -75,70 +87,87 @@ document.addEventListener("DOMContentLoaded", async () => {
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
-            // paymentMethodsResponse.paymentMethods array check
-            if (!Array.isArray(paymentMethodsResponse.paymentMethods)) {
-                console.error("Error: paymentMethodsResponse.paymentMethods is not an array", paymentMethodsResponse.paymentMethods);
-            } else {
-                console.log("paymentMethodsResponse.paymentMethods:", paymentMethodsResponse.paymentMethods);
-            }
+            const applepayConfiguration = {
+                amount: {
+                    value,
+                    currency,
+                },
+                countryCode,
+                isExpress: true,
+                requiredShippingContactFields: ["postalAddress"],
+                onClick: (resolve, reject) => {
+                    console.log("onClick is called :)");
+                    resolve();
+                },
+                onShippingContactSelected: async (resolve, reject, event) => {
+                    console.log("onShippingContactSelected called.");
+                    console.log("Shipping Contact Data:", event.shippingContact);
             
-            //// Click To Pay Availability Check
-            //const isClickToPayAvailable = paymentMethodsResponse.paymentMethods?.some(
-            //    pm => pm.type === "scheme" && pm.clickToPay
-            //);
-            //console.log("Click to Pay available:", isClickToPayAvailable);
-
-            // Card component configuration
-            const cardConfiguration = {
-                hasHolderName: true,
-                enableStoreDetails: true,
-                clickToPayConfiguration: {
-                    "merchantDisplayName" : "CTP Merchant Name",
-                    shopperEmail
+                    const shippingAddress = {
+                        country: event.shippingContact.countryCode,
+                        city: event.shippingContact.locality,
+                        postalCode: event.shippingContact.postalCode,
+                        addressLine1: event.shippingContact.addressLines ? event.shippingContact.addressLines[0] : "",
+                        addressLine2: event.shippingContact.addressLines ? event.shippingContact.addressLines[1] : "",
+                    };
+            
+                    console.log("Extracted Shipping Address:", shippingAddress);
+            
+                    const shippingOutputElement = document.getElementById("shippingAddressOutput");
+                    if (shippingOutputElement) {
+                        shippingOutputElement.style.display = "block";
+                        shippingOutputElement.innerText = JSON.stringify(shippingAddress, null, 2);
+                    }
+            
+                    resolve({
+                        newTotal: {
+                            label: "Total",
+                            amount: `${value}`,
+                            type: "final",
+                        },
+                    });
+                },
+                onPaymentAuthorized: async (resolve, reject, event) => {
+                    console.log("### onPaymentAuthorized called ###");
+                    console.log("Full Payment Authorization Event:", event);
+            
+                    const paymentData = event.payment;
+                    console.log("Payment Token:", paymentData.token);
+                    console.log("Transaction Identifier:", paymentData.transactionIdentifier);
+                    console.log("Billing Contact:", paymentData.billingContact);
+                    console.log("Shipping Contact:", paymentData.shippingContact);
+                    console.log("Full Payment Data (JSON):", JSON.stringify(paymentData, null, 2));
+            
+                    resolve({
+                        status: ApplePaySession.STATUS_SUCCESS
+                    });
                 }
             };
-            console.log("Card Configuration:", cardConfiguration);
 
-            const translations = {
-                "ja-JP": {
-                    "payButton": "決済",
-                    "form.instruction": ""
-                }
-            };
 
             const configObj = {
+                // Global Configuration
+                // https://docs.adyen.com/online-payments/build-your-integration/advanced-flow/?platform=Web&integration=Components&version=6.5.1#add
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                //locale: "en-US",
-                locale: "ja-JP",
-                translations,
-                environment: config.environment,
+                locale: "en-US",
                 countryCode,
-                onChange: updateStateContainer,
+                environment: config.environment,
                 onSubmit: async (state, component, actions) => {
-                    console.log('### card::onSubmit:: calling');
+                    console.log('### applepay::onSubmit:: calling');
 
                     try {
                         document.getElementById("state-container").style.display = "none";
 
+                        // Payment Request Data for /payments
                         const paymentsReqData = {
                             ...state.data,
                             reference,
                             amount: { currency, value },
                             shopperReference,
-                            shopperEmail,
                             returnUrl,
                             origin,
-                            channel: "Web",
-                            ...(nativeThreeDS && {
-                                authenticationData: {
-                                    threeDSRequestData: {
-                                        nativeThreeDS
-                                    }
-                                }
-                            }),
-                            storePaymentMethod: true,
-                            recurringProcessingModel
+                            channel: "Web"
                         };
 
                         updatePaymentsLog("Payment Request", paymentsReqData);
@@ -171,7 +200,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 },
                 onAdditionalDetails: async (state, component, actions) => {
-                    console.log("### card::onAdditionalDetails:: calling");
+                    console.log("### applepay::onAdditionalDetails:: calling");
 
                     try {
                         updatePaymentsLog("Details Request", state.data);
@@ -188,7 +217,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                         console.log("Handling additional details:", { resultCode, action });
                         actions.resolve({ resultCode });
-                        //actions.resolve({ resultCode, action });
+
                     } catch (error) {
                         console.error("Additional details processing error:", error);
                         actions.reject();
@@ -196,23 +225,50 @@ document.addEventListener("DOMContentLoaded", async () => {
                 },
                 onPaymentCompleted: async (result, component) => {
 
-                    console.log("### card::onPaymentCompleted:: calling");
+                    console.log("### applepay::onPaymentCompleted:: calling");
                     console.log(result);
 
-                    const cardContainer = document.getElementById("card-container");
-                    cardContainer.innerHTML = `
+                    const applepayContainer = document.getElementById("applepay-container");
+                    applepayContainer.innerHTML = `
                         <h2>Payment Result</h2>
                         <p><strong>Status:</strong> ${result.resultCode}</p>
                     `;
 
-                }
+                },
+                onPaymentFailed: async (result, component) => {
+
+                    console.log("### applepay::onPaymentFailed:: calling");
+                    console.log(result);
+
+                    const applepayContainer = document.getElementById("applepay-container");
+                    applepayContainer.innerHTML = `
+                        <h2>Payment Result</h2>
+                        <p><strong>Status:</strong> ${result.resultCode}</p>
+                    `;
+
+                },
+                onError: (error, component) => {
+                    console.error(error.name, error.message, error.stack, component);
+                },
+                onChange: updateStateContainer,
             };
 
-            const { AdyenCheckout, Card } = window.AdyenWeb;
+            // Load Required Module from AdyenWeb
+            const { AdyenCheckout, ApplePay } = window.AdyenWeb;
+            // Initiate AdyenCheckout with global configuration
             const checkout = await AdyenCheckout(configObj);
-            const card = new Card(checkout,cardConfiguration).mount("#card-container");
-            //const cardComponent = checkout.create("card", cardConfiguration);
-            //cardComponent.mount("#card-container");
+            // Create component object to mount to DOM
+            const applePayComponent = new ApplePay(checkout, applepayConfiguration);
+
+            applePayComponent
+               .isAvailable()
+               .then(() => {
+                   applePayComponent.mount("#applepay-container");
+               })
+               .catch(e => {
+                   console.error("Apple Pay is not available.");
+                   //Apple Pay is not available
+               });
 
         } catch (error) {
             console.error("Error during initialization:", error);

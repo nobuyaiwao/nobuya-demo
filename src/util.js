@@ -22,12 +22,6 @@ export const generateReference = () => {
            `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 };
 
-//// 🔹 Generate return URL (redirects back to index.html)
-//export const generateReturnUrl = () => {
-//    const host = window.location.origin;
-//    return `${host}/index.html`;
-//};
-
 // 🔹 Generate return URL dynamically based on the current path
 export const generateReturnUrl = () => {
     const host = window.location.origin;
@@ -43,7 +37,7 @@ export const fetchPaymentMethods = async (options) => {
         const response = await fetch("/api/paymentMethods", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(options)  // ✅ Directly use options
+            body: JSON.stringify(options)
         });
 
         if (!response.ok) {
