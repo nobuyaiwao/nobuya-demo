@@ -3,6 +3,7 @@ const cors = require("cors");
 const path = require("path");
 
 const paymentRoutes = require("./routes/payments");
+const sessionRoutes = require("./routes/sessions");
 const configRoutes = require("./routes/config");
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.static(path.join(__dirname, "../src"), { extensions: ["html", "j
 
 // API routes
 app.use("/api", paymentRoutes);
+app.use("/api", sessionRoutes);
 app.use("/api/config", configRoutes);
 
 // Root route
