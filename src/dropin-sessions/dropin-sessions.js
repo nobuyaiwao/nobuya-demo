@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const reference = document.getElementById("reference")?.value;
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
         const shopperReference = document.getElementById("shopperReference")?.value || "guest";
+        const shopperEmail = document.getElementById("shopperEmail")?.value || "user@test.local";
         const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
 
         if (isNaN(value) || value <= 0) {
@@ -64,6 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             countryCode,
             amount: { currency, value },
             shopperReference,
+            shopperEmail,
             reference,
             returnUrl,
             recurringProcessingModel
