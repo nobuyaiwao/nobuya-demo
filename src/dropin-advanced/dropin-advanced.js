@@ -109,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
         const origin = window.location.origin;
         const shopperReference = document.getElementById("shopperReference")?.value || "guest";
+        const shopperEmail = document.getElementById("shopperEmail")?.value || "user@test.local";
         const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
 
 
@@ -117,10 +118,13 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        //const merchantDisplayName = "NobuyaIwaoCOM";
+
         const pmReqConfig = {
             countryCode,
             amount: { currency, value },
-            shopperReference 
+            shopperReference,
+            shopperEmail
         };
 
         console.log("Payment request configuration:", pmReqConfig);
@@ -137,8 +141,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const cardConfiguration = {
                 hasHolderName: true,
                 showStoredPaymentMethods: true, 
-                enableStoreDetails: true
+                enableStoreDetails: true,
+                clickToPayConfiguration: {
+                    merchantDisplayName : "Click To Pay Merchant Name",
+                    shopperEmail
+                }
             };
+            console.log(cardConfiguration);
 
             // Apple Pay configuration with shipping address collection
             const applepayConfiguration = {
