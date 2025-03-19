@@ -142,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 hasHolderName: true,
                 showStoredPaymentMethods: true, 
                 enableStoreDetails: true,
+                enableClickToPay: true,
                 clickToPayConfiguration: {
                     merchantDisplayName : "Click To Pay Merchant Name",
                     shopperEmail
