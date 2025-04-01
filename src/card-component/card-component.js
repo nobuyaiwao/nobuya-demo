@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const pmReqConfig = {
             countryCode,
             amount: { currency, value },
+            shopperEmail,
             shopperReference
         };
 
