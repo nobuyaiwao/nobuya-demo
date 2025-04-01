@@ -268,3 +268,17 @@ input:checked + .slider:before {
     background-color: #0056b3;
 }
 
+//.card-wrapper {
+//  padding: 10px;
+//  border-radius: 20px;
+//  background-color: #fff0f5; /* 薄ピンク */
+//  transition: all 0.2s ease;
+//}
+//
+//.card-wrapper:focus-within {
+//  background-color: #ff00ff !important;
+//  border: 5px dashed #00ffff !important;
+//  border-radius: 100px !important;
+//  box-shadow: 0 0 20px 10px rgba(0, 255, 255, 0.7) !important;
+//}
+

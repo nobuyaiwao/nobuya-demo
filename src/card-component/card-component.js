@@ -93,10 +93,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             const cardConfiguration = {
                 hasHolderName: false,
                 enableStoreDetails: true,
-                clickToPayConfiguration: {
-                    "merchantDisplayName" : "CTP Merchant Name",
-                    shopperEmail
-                },
+                //clickToPayConfiguration: {
+                //    "merchantDisplayName" : "CTP Merchant Name",
+                //    shopperEmail
+                //},
                 challengeWindowSize
             };
             console.log("Card Configuration:", cardConfiguration);
