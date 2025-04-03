@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Adyen Card Modal</title>
+  <script type="module">
+    import {
+      generateReference,
+      generateReturnUrl,
+      getClientConfig,
+      fetchPaymentMethods,
+      makePayment,
+      makeDetails,
+      updateStateContainer
+    } from "/util.js";
+
+    let checkout;
+    let cardComponent;
+
+    const initializeCardComponent = async () => {
+      const config = await getClientConfig();
+      const paymentMethodsResponse = await fetchPaymentMethods({ countryCode: "JP", amount: { value: 5000, currency: "JPY" } });
+
+      checkout = await AdyenCheckout({
+        environment: config.environment,
+        clientKey: config.clientKey,
+        paymentMethodsResponse,
+        onChange: (state) => updateStateContainer(state),
+        onSubmit: async (state, component) => {
+          const reference = generateReference();
+          const paymentRequest = {
+            reference,
+            amount: { value: 5000, currency: "JPY" },
+            paymentMethod: state.data.paymentMethod,
+            channel: "Web",
+            authenticationData: {
+                threeDSRequestData: {
+                    nativeThreeDS : "preferred"
+                }
+            },
+            returnUrl: generateReturnUrl(),
+            origin: window.location.origin
+          };
+
+          const result = await makePayment(paymentRequest);
+
+          if (result.action) {
+            component.handleAction(result.action); 
+          } else {
+            console.log("Payment result:", result);
+          }
+        },
+        onAdditionalDetails: async (state, component) => {
+          const result = await makeDetails(state.data);
+          if (result.action) {
+            component.handleAction(result.action);
+          } else {
+            console.log("Final result:", result);
+          }
+        }
+      });
+
+      cardComponent = checkout.create("card");
+      cardComponent.mount("#card-container");
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("openModal").addEventListener("click", async () => {
+        document.getElementById("paymentModal").classList.add("show");
+        await initializeCardComponent();
+      });
+
+      document.getElementById("closeModal").addEventListener("click", () => {
+        document.getElementById("paymentModal").classList.remove("show");
+        cardComponent?.unmount();
+      });
+
+      document.getElementById("submit-payment").addEventListener("click", () => {
+        cardComponent?.submit();
+      });
+    });
+  </script>
+
+  <!-- Adyen SDK -->
+  <script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.52.0/adyen.js"></script>
+  <link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.52.0/adyen.css" />
+
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 400px;
+    }
+  </style>
+</head>
+<body>
+  <button id="openModal">Open Payment Modal</button>
+
+  <div class="modal" id="paymentModal">
+    <div class="modal-content">
+      <div id="card-container"></div>
+      <button id="submit-payment">Pay</button>
+      <button id="closeModal">Cancel</button>
+    </div>
+  </div>
+
+  <pre id="state-container" style="white-space: pre-wrap;"></pre>
+  <pre id="payments-container" style="white-space: pre-wrap;"></pre>
+</body>
+</html>
+
