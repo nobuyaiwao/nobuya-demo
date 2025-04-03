@@ -83,6 +83,27 @@ document.addEventListener("DOMContentLoaded", async () => {
             } else {
                 console.log("paymentMethodsResponse.paymentMethods:", paymentMethodsResponse.paymentMethods);
             }
+
+            // Define style object
+            var styleObject = {
+              base: {
+                color: '#000',
+                backgroundColor: '#fff',
+                boxShadow: '0 4px 0 0 #007bff',
+                paddingBottom: '8px'
+              },
+              focus: {
+                boxShadow: '0 4px 0 0 #00bcd4'
+              },
+              error: {
+                boxShadow: '0 4px 0 0 red'
+              },
+              placeholder: {
+                color: '#aaa'
+              }
+            };
+
+            
             
             //// Click To Pay Availability Check
             //const isClickToPayAvailable = paymentMethodsResponse.paymentMethods?.some(
@@ -92,13 +113,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Card component configuration
             const cardConfiguration = {
-                hasHolderName: false,
+                hasHolderName: true,
                 enableStoreDetails: true,
                 //clickToPayConfiguration: {
                 //    "merchantDisplayName" : "CTP Merchant Name",
                 //    shopperEmail
                 //},
-                challengeWindowSize
+                challengeWindowSize,
+                styles: styleObject
             };
             console.log("Card Configuration:", cardConfiguration);
 
@@ -112,8 +134,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                //locale: "en-US",
-                locale: "ja-JP",
+                locale: "en-GB",
+                //locale: "ja-JP",
                 translations,
                 environment: config.environment,
                 countryCode,

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Adyen Card in Modal</title>
+  <script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.52.0/adyen.js"></script>
+  <link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.52.0/adyen.css" />
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 400px;
+    }
+  </style>
+</head>
+<body>
+  <button id="openModal">Open Payment Modal</button>
+
+  <div class="modal" id="paymentModal">
+    <div class="modal-content">
+      <div id="card-container"></div>
+      <button id="submit-payment">Pay</button>
+      <button id="closeModal">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    let card, checkout;
+
+    async function initCheckout() {
+      checkout = await AdyenCheckout({
+        clientKey: "test_FLZFMM5BLNB3FJXRV5VIY3ZIZEGQNZUU", 
+        environment: "test",
+        paymentMethodsResponse: {},
+        onSubmit: (state, component) => {
+          console.log("Submit:", state.data);
+        },
+      });
+
+      card = checkout.create('card').mount('#card-container');
+    }
+
+    document.getElementById('openModal').addEventListener('click', async () => {
+      document.getElementById('paymentModal').classList.add('show');
+      await initCheckout();
+    });
+
+    document.getElementById('closeModal').addEventListener('click', () => {
+      document.getElementById('paymentModal').classList.remove('show');
+      card?.unmount();
+    });
+
+    document.getElementById('submit-payment').addEventListener('click', () => {
+      card?.submit();
+    });
+  </script>
+</body>
+</html>
+

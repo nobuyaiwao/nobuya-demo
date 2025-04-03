@@ -89,14 +89,16 @@ pre {
 .input-group input {
     padding: 10px;
     border: 2px solid #ddd;
+    border-bottom: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1rem;
-    transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease;
     background: white;
 }
 
 .input-group input:focus {
     border-color: #007bff;
+    /*border-bottom: 2px solid #ffffff;*/
     outline: none;
     box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
 }
