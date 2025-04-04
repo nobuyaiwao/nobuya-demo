@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             var styleObject = {
               base: {
                 color: '#000',
-                backgroundColor: '#fff',
+                background: '#ccffe5', 
                 boxShadow: '0 4px 0 0 #007bff',
                 paddingBottom: '8px'
               },
@@ -102,8 +102,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 color: '#aaa'
               }
             };
-
-            
             
             //// Click To Pay Availability Check
             //const isClickToPayAvailable = paymentMethodsResponse.paymentMethods?.some(
@@ -119,8 +117,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 //    "merchantDisplayName" : "CTP Merchant Name",
                 //    shopperEmail
                 //},
-                challengeWindowSize,
-                styles: styleObject
+                //styles: styleObject,
+                challengeWindowSize
             };
             console.log("Card Configuration:", cardConfiguration);
 

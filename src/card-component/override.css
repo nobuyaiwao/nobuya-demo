@@ -1,3 +1,4 @@
+/*
 :root {
     --adyen-sdk-color-background-secondary: #ffffff;
     --adyen-sdk-border-radius-xs: 20px;
@@ -7,3 +8,23 @@
     --adyen-sdk-border-radius-xl: 240px;
     --adyen-sdk-border-bottom: 1px dotted gray;
 }
+*/
+.adyen-checkout__input-wrapper {
+/*
+  background: red;
+*/
+  background: #ccffe5; 
+  border-bottom: 3px dashed pink;
+  border: 0.125rem solid red;
+/*
+  border: 0.125rem solid #c0c0c0;
+*/
+  border-radius: 1rem;
+}
+
+.adyen-checkout__input-wrapper:focus-within {
+  border: 2px solid blue !important;
+  background-color: red;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.6);
+}
+
