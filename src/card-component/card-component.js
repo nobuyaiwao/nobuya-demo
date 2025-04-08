@@ -125,6 +125,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                     },
                 },
                 challengeWindowSize,
+                onFieldValid: (cbObj) => {
+                    console.log("### card::onFieldValid:: calling:",cbObj);
+                },
+                onBinValue: (cbObj) => {
+                    console.log("### card::onBinValue:: calling:",cbObj);
+                },
                 onBinLookup: (cbObj) => {
                     console.log("### card::onBinLookup:: calling:",cbObj);
                 } 
@@ -141,7 +147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                locale: "en-GB",
+                locale: "en-US",
                 //locale: "ja-JP",
                 translations,
                 environment: config.environment,
