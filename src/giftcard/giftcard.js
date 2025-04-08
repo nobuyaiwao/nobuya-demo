@@ -100,14 +100,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 onOrderRequest: async (resolve, reject, data) => {
                     console.log("Creating order:", data);
                     try {
+                        const { amount } = { amount: { currency, value }} ; 
+                        console.log("amount for order:", amount);
+                
                         const response = await fetch("/api/orders", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(data)
+                            body: JSON.stringify({ amount })  
                         });
-
+                
                         if (!response.ok) throw new Error("Failed to create order");
-
+                
                         const orderData = await response.json();
                         console.log("Order Response:", orderData);
                         resolve(orderData);

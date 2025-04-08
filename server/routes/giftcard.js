@@ -21,14 +21,14 @@ if (process.env.ADYEN_ENVIRONMENT === "test") {
 
 console.log(`Using Adyen API URL for Giftcard: ${ADYEN_API_URL}`);
 
-// 🔹 ギフトカードの残高を確認するエンドポイント
+// Balance check
 router.post("/balance", async (req, res) => {
     try {
         console.log("Received /balance request:", JSON.stringify(req.body, null, 2));
 
         const balanceRequest = {
             ...req.body,
-            amount: req.body.amount || { currency: "USD", value: 2000 }, // 🔹 デフォルト値を設定
+            amount: req.body.amount || { currency: "USD", value: 2000 }, 
             merchantAccount: process.env.ADYEN_MERCHANT_ACCOUNT
         };
 
@@ -47,13 +47,17 @@ router.post("/balance", async (req, res) => {
     }
 });
 
-// 🔹 ギフトカードの注文を作成するエンドポイント
+// Order request
 router.post("/orders", async (req, res) => {
     try {
         console.log("Received /orders request:", JSON.stringify(req.body, null, 2));
 
+        const { amount } = req.body;
+        const reference = `order-${new Date().toISOString()}`; 
+
         const orderRequest = {
-            ...req.body,
+            amount,
+            reference,
             merchantAccount: process.env.ADYEN_MERCHANT_ACCOUNT
         };
 
@@ -72,7 +76,8 @@ router.post("/orders", async (req, res) => {
     }
 });
 
-// 🔹 ギフトカードの注文をキャンセルするエンドポイント
+
+// Cancel Order
 router.post("/orders/cancel", async (req, res) => {
     try {
         console.log("Received /orders/cancel request:", JSON.stringify(req.body, null, 2));

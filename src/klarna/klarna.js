@@ -44,9 +44,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.querySelector(".input-container").style.display = "none";
         startPaymentButton.style.display = "none";
 
-        const countryCode = document.getElementById("countryCode")?.value || "JP";
-        const currency = document.getElementById("currency")?.value || "JPY";
-        const value = parseInt(document.getElementById("amount")?.value || "5000", 10);
+        const countryCode = document.getElementById("countryCode")?.value || "NL";
+        const currency = document.getElementById("currency")?.value || "EUR";
+        const value = parseInt(document.getElementById("amount")?.value || "2000", 10);
         const reference = document.getElementById("reference")?.value;
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
         const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
@@ -84,56 +84,32 @@ document.addEventListener("DOMContentLoaded", async () => {
                 console.log("paymentMethodsResponse.paymentMethods:", paymentMethodsResponse.paymentMethods);
             }
 
-            // Define style object
-            var styleObject = {
-              base: {
-                color: '#000',
-                background: '#ccffe5', 
-                boxShadow: '0 4px 0 0 #007bff',
-                paddingBottom: '8px'
-              },
-              focus: {
-                boxShadow: '0 4px 0 0 #00bcd4'
-              },
-              error: {
-                boxShadow: '0 4px 0 0 red'
-              },
-              placeholder: {
-                color: '#aaa'
-              }
-            };
+            //// Define style object
+            //var styleObject = {
+            //  base: {
+            //    color: '#000',
+            //    background: '#ccffe5', 
+            //    boxShadow: '0 4px 0 0 #007bff',
+            //    paddingBottom: '8px'
+            //  },
+            //  focus: {
+            //    boxShadow: '0 4px 0 0 #00bcd4'
+            //  },
+            //  error: {
+            //    boxShadow: '0 4px 0 0 red'
+            //  },
+            //  placeholder: {
+            //    color: '#aaa'
+            //  }
+            //};
             
-            //// Click To Pay Availability Check
-            //const isClickToPayAvailable = paymentMethodsResponse.paymentMethods?.some(
-            //    pm => pm.type === "scheme" && pm.clickToPay
-            //);
-            //console.log("Click to Pay available:", isClickToPayAvailable);
-
-            // Card component configuration
-            const cardConfiguration = {
-                hasHolderName: true,
-                enableStoreDetails: true,
-                //clickToPayConfiguration: {
-                //    "merchantDisplayName" : "CTP Merchant Name",
-                //    shopperEmail
-                //},
-                //styles: styleObject,
-                installmentOptions: {
-                    card: {
-                        values: [ 2, 3, 5, 8, 10, 12, 15],
-                        plans: [ 'regular', 'revolving' ]
-                    },
-                },
-                challengeWindowSize,
-                onBinLookup: (cbObj) => {
-                    console.log("### card::onBinLookup:: calling:",cbObj);
-                } 
+            const klarnaConfiguration = {
+                useKlarnaWidget: true // When set to true, the Klarna widget is shown. Set to false or leave the configuration object out to initiate a redirect flow.
             };
-            console.log("Card Configuration:", cardConfiguration);
 
             const translations = {
                 "ja-JP": {
-                    "payButton": "決済",
+                    "payButton": "今すぐ購入",
                     "form.instruction": ""
                 }
             };
@@ -141,11 +117,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                locale: "en-GB",
-                //locale: "ja-JP",
+                //locale: "en-GB",
+                locale: "en-US",
                 translations,
                 environment: config.environment,
                 countryCode,
+                shopperLocale:"en_US",
                 onChange: updateStateContainer,
                 onSubmit: async (state, component, actions) => {
                     console.log('### card::onSubmit:: calling');
@@ -157,20 +134,59 @@ document.addEventListener("DOMContentLoaded", async () => {
                             ...state.data,
                             reference,
                             amount: { currency, value },
+                            countryCode,
                             shopperReference,
                             shopperEmail,
                             returnUrl,
                             origin,
                             channel: "Web",
-                            ...(nativeThreeDS && {
-                                authenticationData: {
-                                    threeDSRequestData: {
-                                        nativeThreeDS
+                            billingAddress: {
+                                city: "Gravenhage",
+                                country: "NL",
+                                houseNumberOrName: "1",
+                                postalCode: "2521VA",
+                                street: "Neherkade"
+                            },
+                            deliveryAddress: {
+                                city: "Gravenhage",
+                                country: "NL",
+                                houseNumberOrName: "1",
+                                postalCode: "2521VA",
+                                street: "Neherkade"
+                            },
+                            lineItems: [
+                                    {
+                                        quantity: "1",
+                                        amountExcludingTax: "331",
+                                        taxPercentage: "2100",
+                                        description: "Shoes",
+                                        id: "Item #1",
+                                        taxAmount: "69",
+                                        amountIncludingTax: "400",
+                                        productUrl: "https://example.com/shoes",
+                                        imageUrl: "https://example.com/shoes.jpg"
+                                    },
+                                    {
+                                        quantity: "2",
+                                        amountExcludingTax: "248",
+                                        taxPercentage: "2100",
+                                        description: "Socks",
+                                        id: "Item #2",
+                                        taxAmount: "52",
+                                        amountIncludingTax: "300",
+                                        productUrl: "https://example.com/socks",
+                                        imageUrl: "https://example.com/socks.jpg"
                                     }
-                                }
-                            }),
-                            storePaymentMethod: true,
-                            recurringProcessingModel
+                                ]
+                            //...(nativeThreeDS && {
+                            //    authenticationData: {
+                            //        threeDSRequestData: {
+                            //            nativeThreeDS
+                            //        }
+                            //    }
+                            //}),
+                            //storePaymentMethod: true,
+                            //recurringProcessingModel
                         };
 
                         updatePaymentsLog("Payment Request", paymentsReqData);
@@ -231,7 +247,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     console.log("### card::onPaymentCompleted:: calling");
                     console.log(result);
 
-                    const cardContainer = document.getElementById("card-container");
+                    const cardContainer = document.getElementById("klarna-container");
                     cardContainer.innerHTML = `
                         <h2>Payment Result</h2>
                         <p><strong>Status:</strong> ${result.resultCode}</p>
@@ -240,11 +256,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             };
 
-            const { AdyenCheckout, Card } = window.AdyenWeb;
+            const { AdyenCheckout, Klarna } = window.AdyenWeb;
             const checkout = await AdyenCheckout(configObj);
-            const card = new Card(checkout,cardConfiguration).mount("#card-container");
-            //const cardComponent = checkout.create("card", cardConfiguration);
-            //cardComponent.mount("#card-container");
+            const klarna = new Klarna(checkout,klarnaConfiguration).mount("#klarna-container");
 
         } catch (error) {
             console.error("Error during initialization:", error);
