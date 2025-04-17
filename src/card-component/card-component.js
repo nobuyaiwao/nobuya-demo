@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
         const challengeWindowSize = document.getElementById("challengeWindowSize")?.value || "02";
 
-        if (isNaN(value) || value <= 0) {
+        if (isNaN(value) || value < 0) {
             console.error("Invalid amount value. Please enter a valid number.");
             return;
         }
@@ -111,19 +111,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Card component configuration
             const cardConfiguration = {
-                hasHolderName: true,
+                hasHolderName: false,
                 enableStoreDetails: true,
                 //clickToPayConfiguration: {
                 //    "merchantDisplayName" : "CTP Merchant Name",
                 //    shopperEmail
                 //},
                 //styles: styleObject,
-                installmentOptions: {
-                    card: {
-                        values: [ 2, 3, 5, 8, 10, 12, 15],
-                        plans: [ 'regular', 'revolving' ]
-                    },
-                },
+                //installmentOptions: {
+                //    card: {
+                //        values: [ 2, 3, 5, 8, 10, 12, 15],
+                //        plans: [ 'regular', 'revolving' ]
+                //    },
+                //},
                 challengeWindowSize,
                 onFieldValid: (cbObj) => {
                     console.log("### card::onFieldValid:: calling:",cbObj);
@@ -139,7 +139,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const translations = {
                 "ja-JP": {
-                    "payButton": "決済",
+                    "payButton": "このカードを登録",
                     "form.instruction": ""
                 }
             };
@@ -147,8 +147,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                locale: "en-US",
-                //locale: "ja-JP",
+                //locale: "en-US",
+                locale: "ja-JP",
                 translations,
                 environment: config.environment,
                 countryCode,
