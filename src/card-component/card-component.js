@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Card component configuration
             const cardConfiguration = {
-                hasHolderName: false,
+                hasHolderName: true,
                 enableStoreDetails: true,
                 //clickToPayConfiguration: {
                 //    "merchantDisplayName" : "CTP Merchant Name",

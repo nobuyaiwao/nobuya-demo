@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
 
 
-        if (isNaN(value) || value <= 0) {
+        if (isNaN(value) || value < 0) {
             console.error("Invalid amount value. Please enter a valid number.");
             return;
         }
