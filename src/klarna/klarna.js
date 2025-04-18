@@ -10,16 +10,16 @@ import {
     handleTestCardCopying
 } from "../util.js";
 
-// 🔹 Enable test card copying
+// Enable test card copying
 handleTestCardCopying();
 
-// 🔹 Function to get URL query parameters
+// Function to get URL query parameters
 const getQueryParam = (param) => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
 };
 
-// 🔹 Function to initialize the Card Component
+// Function to initialize the Klarna Component
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("DOM fully loaded and parsed.");
 
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
         const challengeWindowSize = document.getElementById("challengeWindowSize")?.value || "02";
 
-        if (isNaN(value) || value <= 0) {
+        if (isNaN(value) || value < 0) {
             console.error("Invalid amount value. Please enter a valid number.");
             return;
         }
@@ -77,47 +77,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
-            // paymentMethodsResponse.paymentMethods array check
             if (!Array.isArray(paymentMethodsResponse.paymentMethods)) {
                 console.error("Error: paymentMethodsResponse.paymentMethods is not an array", paymentMethodsResponse.paymentMethods);
             } else {
                 console.log("paymentMethodsResponse.paymentMethods:", paymentMethodsResponse.paymentMethods);
             }
-
-            //// Define style object
-            //var styleObject = {
-            //  base: {
-            //    color: '#000',
-            //    background: '#ccffe5', 
-            //    boxShadow: '0 4px 0 0 #007bff',
-            //    paddingBottom: '8px'
-            //  },
-            //  focus: {
-            //    boxShadow: '0 4px 0 0 #00bcd4'
-            //  },
-            //  error: {
-            //    boxShadow: '0 4px 0 0 red'
-            //  },
-            //  placeholder: {
-            //    color: '#aaa'
-            //  }
-            //};
             
             const klarnaConfiguration = {
                 useKlarnaWidget: true // When set to true, the Klarna widget is shown. Set to false or leave the configuration object out to initiate a redirect flow.
             };
 
-            const translations = {
-                "ja-JP": {
-                    "payButton": "今すぐ購入",
-                    "form.instruction": ""
-                }
-            };
-
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                //locale: "en-GB",
                 locale: "en-US",
                 translations,
                 environment: config.environment,
@@ -178,15 +150,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                                         imageUrl: "https://example.com/socks.jpg"
                                     }
                                 ]
-                            //...(nativeThreeDS && {
-                            //    authenticationData: {
-                            //        threeDSRequestData: {
-                            //            nativeThreeDS
-                            //        }
-                            //    }
-                            //}),
-                            //storePaymentMethod: true,
-                            //recurringProcessingModel
                         };
 
                         updatePaymentsLog("Payment Request", paymentsReqData);
