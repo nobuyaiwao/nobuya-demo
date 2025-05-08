@@ -113,6 +113,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const cardConfiguration = {
                 hasHolderName: true,
                 enableStoreDetails: false,
+                brands: ['visa','mc'],
                 //clickToPayConfiguration: {
                 //    "merchantDisplayName" : "CTP Merchant Name",
                 //    shopperEmail

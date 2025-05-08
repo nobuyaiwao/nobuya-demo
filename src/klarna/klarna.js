@@ -91,7 +91,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
                 locale: "en-US",
-                translations,
                 environment: config.environment,
                 countryCode,
                 shopperLocale:"en_US",
