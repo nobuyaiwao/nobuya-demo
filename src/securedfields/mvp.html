@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adyen Card Component v6 Demo</title>
+    <script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.70.0/adyen.js"></script>
+    <link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.70.0/adyen.css" />
+</head>
+<body>
+    <div id="card-container"></div>
+    <button id="submit-button">Submit</button>
+
+    <script>
+        async function initAdyen() {
+            //const { AdyenCheckout, hogehoge } = window.AdyenWeb;
+            const checkout = new AdyenCheckout({
+                clientKey: 'test_FLZFMM5BLNB3FJXRV5VIY3ZIZEGQNZUU',
+                environment: 'test',
+                countryCode: 'JP',
+                onChange: state => {
+                    console.log('Checkout onChange:', state);
+                }
+            });
+
+            const card = checkout.create('card', {
+                hasHolderName: true,
+                holderNameRequired: true,
+                enableStoreDetails: false,
+                onChange: state => {
+                    console.log('Card onChange:', state);
+                },
+                onFocus: event => {
+                    console.log('Card onFocus:', event);
+                },
+                onBrand: event => {
+                    console.log('Card brand:', event.brand);
+                },
+                onError: error => {
+                    console.error('Card onError:', error);
+                }
+            });
+
+            card.mount('#card-container');
+
+            document.getElementById('submit-button').addEventListener('click', () => {
+                const state = card.data;
+                console.log('Submit pressed, card data:', state);
+
+                if (card.isValid) {
+                    console.log('Card is valid, ready to submit.');
+                } else {
+                    console.warn('Card is invalid, please check input.');
+                }
+            });
+        }
+
+        initAdyen();
+    </script>
+</body>
+</html>
+

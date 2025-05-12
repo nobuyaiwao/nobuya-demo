@@ -103,28 +103,11 @@ document.addEventListener("DOMContentLoaded", async () => {
               }
             };
             
-            //// Click To Pay Availability Check
-            //const isClickToPayAvailable = paymentMethodsResponse.paymentMethods?.some(
-            //    pm => pm.type === "scheme" && pm.clickToPay
-            //);
-            //console.log("Click to Pay available:", isClickToPayAvailable);
-
             // Card component configuration
             const cardConfiguration = {
                 hasHolderName: true,
                 enableStoreDetails: false,
                 brands: ['visa','mc'],
-                //clickToPayConfiguration: {
-                //    "merchantDisplayName" : "CTP Merchant Name",
-                //    shopperEmail
-                //},
-                //styles: styleObject,
-                //installmentOptions: {
-                //    card: {
-                //        values: [ 2, 3, 5, 8, 10, 12, 15],
-                //        plans: [ 'regular', 'revolving' ]
-                //    },
-                //},
                 challengeWindowSize,
                 onFieldValid: (cbObj) => {
                     console.log("### card::onFieldValid:: calling:",cbObj);
@@ -148,7 +131,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                //locale: "en-US",
                 locale: "ja-JP",
                 translations,
                 environment: config.environment,
@@ -247,11 +229,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             };
 
-            const { AdyenCheckout, Card } = window.AdyenWeb;
+            //const { AdyenCheckout, Card } = window.AdyenWeb;
             const checkout = await AdyenCheckout(configObj);
-            const card = new Card(checkout,cardConfiguration).mount("#card-container");
-            //const cardComponent = checkout.create("card", cardConfiguration);
-            //cardComponent.mount("#card-container");
+            //const card = new Card(checkout,cardConfiguration).mount("#card-container");
+            const cardComponent = checkout.create("card", cardConfiguration);
+            cardComponent.mount("#card-container");
 
         } catch (error) {
             console.error("Error during initialization:", error);
