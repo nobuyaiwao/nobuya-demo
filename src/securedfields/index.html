@@ -18,13 +18,13 @@
     <link rel="stylesheet"
      href="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/5.70.0/adyen.css">
 
-    <link rel="stylesheet" href="./override.css">
     <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="./customcards.style.css">
 </head>
 <body>
     <div class="container">
         <div class="left-panel">
-            <h1>Card Component (Advanced Flow)</h1>
+            <h1>SecuredFields (Advanced Flow)</h1>
             <div class="input-container">
                 <label for="countryCode">Country Code</label>
                 <input type="text" id="countryCode" value="JP">
@@ -70,10 +70,60 @@
             </div>
 
             <button id="start-payment">Here we go!</button>
-            <!--div class="card-wrapper">
-              <div id="card-container" tabindex="-1"></div>
-            </div-->
-            <div id="card-container"></div>
+
+            <div class="payment-method">
+                <div id="card-container" class="payment-method__container">
+                    <span class="pm-image">
+                        <img
+                            class="pm-image-1"
+                            width="40"
+                            src="https://checkoutshopper-test.adyen.com/checkoutshopper/images/logos/nocard.svg"
+                            alt=""
+                        />
+                    </span>
+                    <span class="pm-image-dual">
+                        <img
+                            class="pm-image-dual-1"
+                            width="40"
+                            alt=""
+                        />
+                        <img
+                            class="pm-image-dual-2"
+                            width="40"
+                            alt=""
+                        />
+                    </span>
+                    <label class="pm-form-label pm-form-label-pan">
+                        <span class="pm-form-label__text">Card number:</span>
+                        <span class="pm-input-field" data-cse="encryptedCardNumber"></span>
+                        <span class="pm-form-label__error-text">Please enter a valid credit card number</span>
+                    </label>
+                    <label class="pm-form-label pm-form-label--exp-month">
+                        <span class="pm-form-label__text">Expiry month:</span>
+                        <span class="pm-input-field" data-cse="encryptedExpiryMonth"></span>
+                        <span class="pm-form-label__error-text">Date error text</span>
+                    </label>
+                    <label class="pm-form-label pm-form-label--exp-year">
+                        <span class="pm-form-label__text">Expiry year:</span>
+                        <span class="pm-input-field" data-cse="encryptedExpiryYear"></span>
+                        <span class="pm-form-label__error-text">Date error text</span>
+                    </label>
+                    <label class="pm-form-label pm-form-label--cvc">
+                        <span class="pm-form-label__text">CVV/CVC:</span>
+                        <span class="pm-input-field" data-cse="encryptedSecurityCode"></span>
+                        <span class="pm-form-label__error-text">CVC Error text</span>
+                    </label>
+                </div>
+                <div class="card-input__spinner__holder">
+                    <div class="card-input__spinner card-input__spinner--active">
+                        <div class="adyen-checkout__spinner__wrapper ">
+                            <div class="adyen-checkout__spinner adyen-checkout__spinner--large"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
 
             <div class="button-group">
                 <button onclick="window.location.href='../index.html'">Go Back</button>
@@ -101,7 +151,7 @@
     </div>
 
     <script src="/test-cards.js"></script>
-    <script type="module" src="./card-component.js"></script>
+    <script type="module" src="./securedfields.js"></script>
 </body>
 </html>
 

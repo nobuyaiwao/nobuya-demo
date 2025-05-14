@@ -36,11 +36,11 @@
     position: relative;
 }
 .pm-input-field {
-    background: white;
+    background: pink;
     border: 1px solid #d8d8d8;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    border-radius: 4px;
+    border-radius: 12px;
     box-sizing: border-box;
     clear: left;
     font-size: 0.93333333333em;

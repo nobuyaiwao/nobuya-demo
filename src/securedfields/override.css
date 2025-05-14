@@ -1,0 +1,37 @@
+#card-container {
+    max-width: 400px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.pm-image {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+}
+
+.pm-form-label--exp-month,
+.pm-form-label--exp-year {
+    width: 48%;
+    float: left;
+    clear: none;
+}
+
+.pm-form-label--cvc {
+    width: 40%;
+    float: right;
+    clear: none;
+}
+
+.js-securedfields-pay-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #00112c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    margin-top: 20px;
+    font-size: 16px;
+}
+

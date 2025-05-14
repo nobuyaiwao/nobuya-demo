@@ -232,7 +232,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             //const { AdyenCheckout, Card } = window.AdyenWeb;
             const checkout = await AdyenCheckout(configObj);
             //const card = new Card(checkout,cardConfiguration).mount("#card-container");
-            const cardComponent = checkout.create("card", cardConfiguration);
+            const cardComponent = checkout.create("securedfields", cardConfiguration);
             cardComponent.mount("#card-container");
 
         } catch (error) {
