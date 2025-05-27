@@ -10,6 +10,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
+app.set("trust proxy", true); 
+
+app.use((req, res, next) => {
+    const ip = req.ip;
+    const userAgent = req.headers["user-agent"];
+    const method = req.method;
+    const url = req.originalUrl;
+    const timestamp = new Date().toISOString();
+
+    console.log(`[${timestamp}] IP: ${ip} | UA: ${userAgent} | ${method} ${url}`);
+    next();
+});
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
