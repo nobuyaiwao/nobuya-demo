@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const shopperEmail = document.getElementById("shopperEmail")?.value || "test@example.com";
         const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
         const challengeWindowSize = document.getElementById("challengeWindowSize")?.value || "02";
+        const browserLang = document.getElementById("browserLang")?.value || "ja-JP";
 
         if (isNaN(value) || value < 0) {
             console.error("Invalid amount value. Please enter a valid number.");
@@ -111,23 +112,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Card component configuration
             const cardConfiguration = {
-                hasHolderName: true,
-                enableStoreDetails: false,
-                hideCVC: true,
-                brands: ['visa','mc'],
+                hasHolderName: false,
+                //enableStoreDetails: false,
+                //hideCVC: true,
+                //brands: ['visa','mc']
                 //clickToPayConfiguration: {
                 //    "merchantDisplayName" : "CTP Merchant Name",
                 //    shopperEmail
                 //},
                 //styles: styleObject,
-                installmentOptions: {
-                    visa: {
-                        values: [ 1,3,6,9,12 ]
-                        //values: [ 2, 3, 5, 8, 10, 12, 15]
-                        //plans: [ 'regular', 'revolving' ]
-                        //plans: [ 'regular' ]
-                    },
-                },
+                //installmentOptions: {
+                //    visa: {
+                //        values: [ 1,3,6,9,12 ]
+                //        //values: [ 2, 3, 5, 8, 10, 12, 15]
+                //        //plans: [ 'regular', 'revolving' ]
+                //        //plans: [ 'regular' ]
+                //    },
+                //},
                 challengeWindowSize,
                 onFieldValid: (cbObj) => {
                     console.log("### card::onFieldValid:: calling:",cbObj);
@@ -165,6 +166,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                         const paymentsReqData = {
                             ...state.data,
+                            browserInfo: {
+                                ...state.data.browserInfo,
+                                language: browserLang
+                            },
                             reference,
                             amount: { currency, value },
                             shopperReference,
