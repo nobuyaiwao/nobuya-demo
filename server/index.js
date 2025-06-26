@@ -19,7 +19,7 @@ app.use((req, res, next) => {
     const url = req.originalUrl;
     const timestamp = new Date().toISOString();
 
-    console.log(`[${timestamp}] IP: ${ip} | UA: ${userAgent} | ${method} ${url}`);
+    //console.log(`[${timestamp}] IP: ${ip} | UA: ${userAgent} | ${method} ${url}`);
     next();
 });
 
