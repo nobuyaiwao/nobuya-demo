@@ -135,6 +135,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 onBinValue: (cbObj) => {
                     console.log("### card::onBinValue:: calling:",cbObj);
                 },
+                onBrand: (cbObj) => {
+                    console.log("### card::onBrand:: calling:",cbObj);
+                },
                 onBinLookup: (cbObj) => {
                     console.log("### card::onBinLookup:: calling:",cbObj);
                 } 

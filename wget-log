@@ -1,0 +1,11 @@
+--2025-06-18 14:49:11--  https://checkoutshopper-test.adyen.com/checkoutshopper/securedfields/test_IRKVC56MTJB7JNYZQZRZPITGJQVRAMDH/4.10.0/securedFields.html?type=card
+Resolving checkoutshopper-test.adyen.com (checkoutshopper-test.adyen.com)... 104.16.225.235, 104.16.224.235
+Connecting to checkoutshopper-test.adyen.com (checkoutshopper-test.adyen.com)|104.16.225.235|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Saving to: ‘securedFields.html?type=card’
+
+securedFields.html?type=card                                [<=>                                                                                                                            ]       0  --.-KB/s               securedFields.html?type=card                                [ <=>                                                                                                                           ]     333  --.-KB/s    in 0s      
+
+2025-06-18 14:49:12 (30.4 MB/s) - ‘securedFields.html?type=card’ saved [333]
+
