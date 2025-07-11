@@ -86,20 +86,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Define style object
             var styleObject = {
+              //base: {
+              //  color: '#000',
+              //  background: '#ccffe5', 
+              //  boxShadow: '0 4px 0 0 #007bff',
+              //  paddingBottom: '8px'
+              //},
+              //focus: {
+              //  boxShadow: '0 4px 0 0 #00bcd4'
+              //},
+              //error: {
+              //  boxShadow: '0 4px 0 0 red'
+              //},
               base: {
-                color: '#000',
-                background: '#ccffe5', 
-                boxShadow: '0 4px 0 0 #007bff',
-                paddingBottom: '8px'
-              },
-              focus: {
-                boxShadow: '0 4px 0 0 #00bcd4'
+                color: "black",
+                fontSize: "14px",
+                fontSmoothing: "antialiased",
+                fontFamily:
+                'var(--default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji")',
               },
               error: {
-                boxShadow: '0 4px 0 0 red'
+                color: "#DD2352",
               },
               placeholder: {
-                color: '#aaa'
+                color: '#aaa',
+                fontSize: "14px"
               }
             };
             
@@ -111,15 +122,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Card component configuration
             const cardConfiguration = {
+                placeholders: {
+                    cardNumber: "0123 4567 8901 2345",
+                    expiryDate: "MM/YY",
+                    securityCodeThreeDigits: "123",
+                    holderName: "TARO YAMADA"
+                },
                 hasHolderName: true,
-                enableStoreDetails: false,
-                hideCVC: true,
+                enableStoreDetails: true,
+                //hideCVC: true,
                 brands: ['visa','mc'],
                 //clickToPayConfiguration: {
                 //    "merchantDisplayName" : "CTP Merchant Name",
                 //    shopperEmail
                 //},
-                //styles: styleObject,
+                styles: styleObject,
                 installmentOptions: {
                     visa: {
                         values: [ 1,3,6,9,12 ]
@@ -154,12 +171,31 @@ document.addEventListener("DOMContentLoaded", async () => {
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                //locale: "en-US",
-                locale: "ja-JP",
+                locale: "en-US",
+                //locale: "ja-JP",
                 translations,
                 environment: config.environment,
                 countryCode,
                 onChange: updateStateContainer,
+ /*
+                onChange: (state, component) => {
+                    updateStateContainer(state);
+                
+                    const holderName = state?.data?.paymentMethod?.holderName || "";
+                
+                    // ASCII（英数字と空白）のみ許容
+                    const isAsciiOnly = /^[\x00-\x7F]*$/.test(holderName);
+                
+                    if (!isAsciiOnly && holderName.length > 0) {
+                        // バリデーションエラーを手動で表示
+                        component.setStatus('invalid', { reason: 'holderName' });
+                        console.log("invalid character is used for holderName");
+                
+                        // フィールド自体に明示的なエラーメッセージを表示することは難しいが、
+                        // onSubmitをブロックするだけでもUXとして自然
+                    }
+                },
+*/
                 onSubmit: async (state, component, actions) => {
                     console.log('### card::onSubmit:: calling');
 
@@ -258,6 +294,31 @@ document.addEventListener("DOMContentLoaded", async () => {
             const card = new Card(checkout,cardConfiguration).mount("#card-container");
             //const cardComponent = checkout.create("card", cardConfiguration);
             //cardComponent.mount("#card-container");
+
+/*
+            let isComposing = false;
+
+            document.addEventListener("compositionstart", (event) => {
+              if (event.target.name === "holderName") {
+                isComposing = true;
+              }
+            });
+            
+            document.addEventListener("compositionend", (event) => {
+              if (event.target.name === "holderName") {
+                isComposing = false;
+                // 日本語入力が確定された場合も、即座に消す
+                event.target.value = event.target.value.replace(/[^a-zA-Z0-9\s]/g, '');
+              }
+            });
+            
+            document.addEventListener("input", function (event) {
+              if (event.target.name === "holderName" && !isComposing) {
+                event.target.value = event.target.value.replace(/[^a-zA-Z0-9\s]/g, '');
+              }
+            });
+ */           
+
 
         } catch (error) {
             console.error("Error during initialization:", error);

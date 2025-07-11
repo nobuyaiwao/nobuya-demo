@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title class="t-head-title">Adyen Checkout Components sample</title>
+    <link rel="stylesheet" href="https://checkoutshopper-test.cdn.adyen.com/checkoutshopper/sdk/5.70.0/adyen.css?v=1747387641" integrity="sha384-vnFzKtL6or8feSmGXv74mP3BXRwZrU/ajQUdEDNM/9aYu96j29wUpUupFqr1Hyo3" crossorigin="anonymous"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://checkoutshopper-test.cdn.adyen.com/checkoutshopper/sdk/5.70.0/adyen.js?v=1747387641" integrity="sha384-N4W6Y4K3vGbiqQmdDoM/SF1RvRHG0FRmMmszNnVqEMDZMJR+wunTZTZdNLHCljwQ" crossorigin="anonymous"></script>
+  </head>
+  <body class="no-menu">
+    <div class="container container--full-width">
+        <div class="main">
+            <div class="checkout-container">
+                <a href="../">Back</a>
+
+                <h1>Drop-in</h1>
+                <div class="payment-method">
+                    <div id="dropin-container">
+                        <!-- Drop-in will be rendered here -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+  </body>
+
+  <script>
+    const langQuery =
+      new URLSearchParams(window.location.search).get("lang") || "ja-JP";
+    const Kanat = {
+      environment: "test", // test or live
+      amount: {
+        currency: "JPY",
+        value: 2000,
+      },
+      locale: langQuery, // en-US or ja-JP
+      serviceCountry: "JP",
+      country: {
+        US: "US",
+        JP: "JP",
+      },
+      adyen: {
+        clientKey: "test_FLZFMM5BLNB3FJXRV5VIY3ZIZEGQNZUU",
+        paymentMethodsResponse: {
+          paymentMethods: [
+            {
+              brands: ["visa", "mc", "jcb"],
+              type: "scheme",
+            },
+          ],
+          storedPaymentMethods: [
+            {
+              brand: "mc",
+              expiryMonth: "11",
+              expiryYear: "2031",
+              holderName: "Checkout Shopper PlaceHolder",
+              id: "8316030945031375",
+              lastFour: "5454",
+              name: "MasterCard",
+              supportedShopperInteractions: ["Ecommerce", "ContAuth"],
+              type: "scheme",
+            },
+          ],
+        },
+        showPayButton: true,
+        paymentMethods: {
+          card: {
+            hasHolderName: true,
+            holderNameRequired: true,
+            enableStoreDetails: false,
+            hideCVC: false,
+            autoFocus: false,
+            showPayButton: true,
+            billingAddressRequired: false,
+            billingAddressAllowedCountries: [this.serviceCountry],
+            // Optionally pre-fill some fields, here all fields are filled:
+            onError: function (event) {
+            },
+          },
+        },
+        onReady: function () {},
+        onSubmit: function (state, dropin) {
+          console.log("root submit");
+          // ToDo cardholer値の取得 & /enter送信処理
+          console.log(JSON.stringify(state));
+        },
+        onError: function (event) {
+        },
+      },
+    };
+
+const configCard = {
+  autoFocus: Kanat.adyen.paymentMethods.card.autoFocus,
+  hasHolderName: Kanat.adyen.paymentMethods.card.hasHolderName,
+  holderNameRequired: Kanat.adyen.paymentMethods.card.holderNameRequired,
+  enableStoreDetails: Kanat.adyen.paymentMethods.card.enableStoreDetails,
+  hideCVC: Kanat.adyen.paymentMethods.card.hideCVC,
+  showPayButton: Kanat.adyen.paymentMethods.card.showPayButton,
+  billingAddressRequired: Kanat.adyen.paymentMethods.card.billingAddressRequired,
+  data: Kanat.adyen.paymentMethods.card.data
+}
+
+const configStoredCard = Object.assign({}, configCard);
+configStoredCard.hideCVC = false;
+
+    const configNewPayment = {
+      paymentMethodsResponse: Kanat.adyen.paymentMethodsResponse,
+      clientKey: Kanat.adyen.clientKey,
+      locale: Kanat.locale,
+      environment: Kanat.environment,
+      showPayButton: Kanat.adyen.showPayButton,
+      onSubmit: Kanat.adyen.onSubmit,
+      onError: Kanat.adyen.onError,
+      paymentMethodsConfiguration: {
+          card: configCard,
+          storedCard: configStoredCard
+      }
+    };
+
+    const configDropIn = {
+      showStoredPaymentMethods: true,
+      onReady: Kanat.adyen.onReady
+    }
+
+    var dropinNew;
+    async function asyncCheckout() {
+      const checkoutNew = await AdyenCheckout(configNewPayment);
+      dropinNew = checkoutNew.create('dropin', configDropIn).mount('#dropin-container');
+    }
+
+    $(document).ready(function() {
+      asyncCheckout();
+    })
+
+    /**
+     * フォーム送信
+     */
+    const submit = () => {
+      dropinNew.submit();
+    };
+  </script>
+</html>
+
