@@ -19,7 +19,7 @@ const getQueryParam = (param) => {
     return urlParams.get(param);
 };
 
-// Function to initialize the Card Component
+// Function to initialize the PayPal Component
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("DOM fully loaded and parsed.");
 
@@ -44,15 +44,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.querySelector(".input-container").style.display = "none";
         startPaymentButton.style.display = "none";
 
-        const countryCode = document.getElementById("countryCode")?.value || "JP";
-        const currency = document.getElementById("currency")?.value || "JPY";
-        const value = parseInt(document.getElementById("amount")?.value || "5000", 10);
+        const countryCode = document.getElementById("countryCode")?.value || "US";
+        const telephoneNumber = document.getElementById("telephoneNumber")?.value || "+447755564318";
+        const currency = document.getElementById("currency")?.value || "USD";
+        const value = parseInt(document.getElementById("amount")?.value || "2000", 10);
         const reference = document.getElementById("reference")?.value;
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
         const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
         const origin = window.location.origin;
         const shopperReference = document.getElementById("shopperReference")?.value || "guest";
-        const shopperEmail = document.getElementById("shopperEmail")?.value || "test@example.com";
+        const shopperEmail = document.getElementById("shopperEmail")?.value || "customer@email.uk";
         const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
         const challengeWindowSize = document.getElementById("challengeWindowSize")?.value || "02";
 
@@ -77,68 +78,45 @@ document.addEventListener("DOMContentLoaded", async () => {
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
-            // paymentMethodsResponse.paymentMethods array check
             if (!Array.isArray(paymentMethodsResponse.paymentMethods)) {
                 console.error("Error: paymentMethodsResponse.paymentMethods is not an array", paymentMethodsResponse.paymentMethods);
             } else {
                 console.log("paymentMethodsResponse.paymentMethods:", paymentMethodsResponse.paymentMethods);
             }
-
-            // Define style object
-            var styleObject = {
-              base: {
-                color: '#000',
-                background: '#ccffe5', 
-                boxShadow: '0 4px 0 0 #007bff',
-                paddingBottom: '8px'
-              },
-              focus: {
-                boxShadow: '0 4px 0 0 #00bcd4'
-              },
-              error: {
-                boxShadow: '0 4px 0 0 red'
-              },
-              placeholder: {
-                color: '#aaa'
-              }
-            };
             
-            // Card component configuration
-            const cardConfiguration = {
-                hasHolderName: false,
-                enableStoreDetails: false,
-                brands: ['visa','mc'],
-                challengeWindowSize,
-                onFieldValid: (cbObj) => {
-                    console.log("### card::onFieldValid:: calling:",cbObj);
+            // PayPal configuration
+            const paypalConfiguration = {
+                style: { // Optional configuration for PayPal payment buttons.
+                    layout: "vertical",
+                    color: "blue"
                 },
-                onBinValue: (cbObj) => {
-                    console.log("### card::onBinValue:: calling:",cbObj);
+                //cspNonce: "MY_CSP_NONCE",
+                //onShippingChange: function(data, actions) {
+                //    // Listen to shipping changes.
+                //},
+                onInit: (data, actions) => {
+                    // onInit is called when the button first renders.
+                    // Call actions.enable() to enable the button.
+                    actions.enable();
+                    // Or actions.disable() to disable it.
                 },
-                onBinLookup: (cbObj) => {
-                    console.log("### card::onBinLookup:: calling:",cbObj);
-                } 
-            };
-            console.log("Card Configuration:", cardConfiguration);
-
-            const translations = {
-                "ja-JP": {
-                    "payButton": "このカードを登録",
-                    "form.instruction": ""
-                }
+                //onClick: () => {
+                //    // onClick is called when the button is clicked.
+                //},
+                blockPayPalCreditButton: true,
+                blockPayPalPayLaterButton: true
             };
 
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                locale: "ja-JP",
-                translations,
-                showPayButton: true,
+                locale: "en-US",
                 environment: config.environment,
                 countryCode,
+                shopperLocale:"en_US",
                 onChange: updateStateContainer,
                 onSubmit: async (state, component, actions) => {
-                    console.log('### card::onSubmit:: calling');
+                    console.log('### paypal::onSubmit:: calling');
 
                     try {
                         document.getElementById("state-container").style.display = "none";
@@ -147,20 +125,35 @@ document.addEventListener("DOMContentLoaded", async () => {
                             ...state.data,
                             reference,
                             amount: { currency, value },
+                            countryCode,
+                            telephoneNumber,
                             shopperReference,
                             shopperEmail,
                             returnUrl,
                             origin,
                             channel: "Web",
-                            ...(nativeThreeDS && {
-                                authenticationData: {
-                                    threeDSRequestData: {
-                                        nativeThreeDS
+                            billingAddress: {
+                                city: "London",
+                                country: "GB",
+                                houseNumberOrName: "Apt. 214",
+                                postalCode: "W1S 3BE",
+                                street: "10 New Burlington Street"
+                            },
+                            deliveryAddress: {
+                                city: "London",
+                                country: "GB",
+                                houseNumberOrName: "Apt. 214",
+                                postalCode: "W1S 3BE",
+                                street: "10 New Burlington Street"
+                            },
+                            lineItems: [
+                                    {
+                                        quantity: "1",
+                                        description: "Shoes",
+                                        id: "Item #1",
+                                        amountIncludingTax: "2000"
                                     }
-                                }
-                            }),
-                            storePaymentMethod: true,
-                            recurringProcessingModel
+                                ]
                         };
 
                         updatePaymentsLog("Payment Request", paymentsReqData);
@@ -193,7 +186,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 },
                 onAdditionalDetails: async (state, component, actions) => {
-                    console.log("### card::onAdditionalDetails:: calling");
+                    console.log("### paypal::onAdditionalDetails:: calling");
 
                     try {
                         updatePaymentsLog("Details Request", state.data);
@@ -209,8 +202,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const { resultCode, action } = result;
 
                         console.log("Handling additional details:", { resultCode, action });
-                        //actions.resolve({ resultCode });
-                        actions.resolve({ resultCode, action });
+                        actions.resolve({ resultCode });
+                        //actions.resolve({ resultCode, action });
                     } catch (error) {
                         console.error("Additional details processing error:", error);
                         actions.reject();
@@ -218,10 +211,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 },
                 onPaymentCompleted: async (result, component) => {
 
-                    console.log("### card::onPaymentCompleted:: calling");
+                    console.log("### paypal::onPaymentCompleted:: calling");
                     console.log(result);
 
-                    const cardContainer = document.getElementById("card-container");
+                    const cardContainer = document.getElementById("klarna-container");
                     cardContainer.innerHTML = `
                         <h2>Payment Result</h2>
                         <p><strong>Status:</strong> ${result.resultCode}</p>
@@ -230,11 +223,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             };
 
-            //const { AdyenCheckout, Card } = window.AdyenWeb;
+            const { AdyenCheckout, PayPal } = window.AdyenWeb;
             const checkout = await AdyenCheckout(configObj);
-            //const card = new Card(checkout,cardConfiguration).mount("#card-container");
-            const cardComponent = checkout.create("card", cardConfiguration);
-            cardComponent.mount("#card-container");
+            const paypal = new PayPal(checkout,paypalConfiguration).mount("#paypal-container");
 
         } catch (error) {
             console.error("Error during initialization:", error);

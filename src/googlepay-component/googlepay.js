@@ -84,42 +84,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 console.log("paymentMethodsResponse.paymentMethods:", paymentMethodsResponse.paymentMethods);
             }
 
-            // Define style object
-            var styleObject = {
-              base: {
-                color: '#000',
-                background: '#ccffe5', 
-                boxShadow: '0 4px 0 0 #007bff',
-                paddingBottom: '8px'
-              },
-              focus: {
-                boxShadow: '0 4px 0 0 #00bcd4'
-              },
-              error: {
-                boxShadow: '0 4px 0 0 red'
-              },
-              placeholder: {
-                color: '#aaa'
-              }
+            // Google Pay component configuration
+            const googlePayConfiguration = {
+                amount: { value, currency },
+                countryCode,
+                environment: config.environment
             };
-            
-            // Card component configuration
-            const cardConfiguration = {
-                hasHolderName: false,
-                enableStoreDetails: false,
-                brands: ['visa','mc'],
-                challengeWindowSize,
-                onFieldValid: (cbObj) => {
-                    console.log("### card::onFieldValid:: calling:",cbObj);
-                },
-                onBinValue: (cbObj) => {
-                    console.log("### card::onBinValue:: calling:",cbObj);
-                },
-                onBinLookup: (cbObj) => {
-                    console.log("### card::onBinLookup:: calling:",cbObj);
-                } 
-            };
-            console.log("Card Configuration:", cardConfiguration);
+            console.log("Google Pay Configuration:", googlePayConfiguration);
 
             const translations = {
                 "ja-JP": {
@@ -131,14 +102,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                locale: "ja-JP",
+                locale: "en-US",
+                //locale: "ja-JP",
                 translations,
-                showPayButton: true,
                 environment: config.environment,
                 countryCode,
                 onChange: updateStateContainer,
                 onSubmit: async (state, component, actions) => {
-                    console.log('### card::onSubmit:: calling');
+                    console.log('### googlepay::onSubmit:: calling');
 
                     try {
                         document.getElementById("state-container").style.display = "none";
@@ -193,7 +164,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 },
                 onAdditionalDetails: async (state, component, actions) => {
-                    console.log("### card::onAdditionalDetails:: calling");
+                    console.log("### googlepay::onAdditionalDetails:: calling");
 
                     try {
                         updatePaymentsLog("Details Request", state.data);
@@ -209,8 +180,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const { resultCode, action } = result;
 
                         console.log("Handling additional details:", { resultCode, action });
-                        //actions.resolve({ resultCode });
-                        actions.resolve({ resultCode, action });
+                        actions.resolve({ resultCode });
                     } catch (error) {
                         console.error("Additional details processing error:", error);
                         actions.reject();
@@ -218,11 +188,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 },
                 onPaymentCompleted: async (result, component) => {
 
-                    console.log("### card::onPaymentCompleted:: calling");
+                    console.log("### googlepay::onPaymentCompleted:: calling");
                     console.log(result);
 
-                    const cardContainer = document.getElementById("card-container");
-                    cardContainer.innerHTML = `
+                    const googlepayContainer = document.getElementById("googlepay-container");
+                    googlepayContainer.innerHTML = `
                         <h2>Payment Result</h2>
                         <p><strong>Status:</strong> ${result.resultCode}</p>
                     `;
@@ -230,11 +200,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             };
 
-            //const { AdyenCheckout, Card } = window.AdyenWeb;
+            const { AdyenCheckout, GooglePay } = window.AdyenWeb;
             const checkout = await AdyenCheckout(configObj);
-            //const card = new Card(checkout,cardConfiguration).mount("#card-container");
-            const cardComponent = checkout.create("card", cardConfiguration);
-            cardComponent.mount("#card-container");
+            const googlepay = new GooglePay(checkout,googlePayConfiguration).mount("#googlepay-container");
 
         } catch (error) {
             console.error("Error during initialization:", error);

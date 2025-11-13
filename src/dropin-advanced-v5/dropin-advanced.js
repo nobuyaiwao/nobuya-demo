@@ -238,7 +238,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 environment: config.environment,
                 countryCode,
                 onChange: updateStateContainer,
-                onSubmit: async (state, component, actions) => {
+                //onSubmit: async (state, component, actions) => {
+                onSubmit: async (state, component) => {
                     console.log('### card::onSubmit:: calling');
 
                     try {
@@ -264,26 +265,41 @@ document.addEventListener("DOMContentLoaded", () => {
                             ...(state.data.paymentMethod?.storedPaymentMethodId && { shopperInteraction: "ContAuth" })
                         };
 
-                        const { action, resultCode } = await makePayment(paymentsReqData);
+                        makePayment( paymentsReqData )
+                           .then(response => {
+                             if (response.action) {
+                               // Drop-in handles the action object from the /payments response
+                               dropin.handleAction(response.action);
+                             } else {
+                               // Your function to show the final result to the shopper
+                               //showFinalResult(response);
+                                console.log(response);
+                             }
+                           })
+                           .catch(error => {
+                             throw Error(error);
+                           });
 
-                        if (!resultCode) {
-                            console.error("Payment failed, missing resultCode.");
-                            actions.reject();
-                            return;
-                        }
+                        //const { action, resultCode } = await makePayment(paymentsReqData);
 
-                        console.log("Handling action:", action);
-                        actions.resolve({ resultCode, action });
-                        //actions.resolve({ });
+                        //if (!resultCode) {
+                        //    console.error("Payment failed, missing resultCode.");
+                        //    actions.reject();
+                        //    return;
+                        //}
+
+                        //console.log("Handling action:", action);
+                        //actions.resolve({ resultCode, action });
+                        ////actions.resolve({ });
 
                     } catch (error) {
                         console.error("Payment error:", error);
                         actions.reject();
                     }
                 },
-                onAdditionalDetails: async (state, component, actions) => {
+                //onAdditionalDetails: async (state, component, actions) => {
+                onAdditionalDetails: async (state, component) => {
                     console.log("### card::onAdditionalDetails:: calling");
-                    console.log(state);
 
                     try {
                         const result = await makeDetails(state.data);
@@ -298,37 +314,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         console.log("Handling additional details:", { resultCode, action, order, donationToken });
 
-                        actions.resolve({
-                            resultCode,
-                            action,
-                            order,
-                            donationToken,
-                        });
+                        if ( action ) {
+                            dropin.handleAction(response.action);
+                        } else { 
+                            console.log( resultCode );
+                        }
+
+                        //actions.resolve({
+                        //    resultCode,
+                        //    action,
+                        //    order,
+                        //    donationToken,
+                        //});
 
                     } catch (error) {
                         console.error("Additional details processing error:", error);
                         actions.reject();
                     }
                 },
-                onError: (error) => {
+                onError: (error,component) => {
                     console.log("### card::onError:: calling");
                     console.log(error);
-                },
-                onPaymentCompleted: (result,component) => {
-                    console.log("### card::onPaymentCompleted:: calling");
-                    console.log(result);
-                    console.log(component);
-                },
-                onPaymentFailed: (result,component) => {
-                    console.log("### card::onPaymentFailed:: calling");
-                    console.log(result);
-                    console.log(component);
                 }
             };
 
-            const { AdyenCheckout, Dropin } = window.AdyenWeb;
+            //const { AdyenCheckout, Dropin } = window.AdyenWeb;
             const checkout = await AdyenCheckout(configObj);
-            new Dropin(checkout,dropinConfiguration).mount("#dropin-container");
+            //new Dropin(checkout,dropinConfiguration).mount("#dropin-container");
+            const dropin = checkout
+              .create('dropin', {
+              // Starting from version 4.0.0, Drop-in configuration only accepts props related to itself and cannot contain generic configuration like the onSubmit event.
+                  openFirstPaymentMethod:false
+              })
+             .mount('#dropin-container');
 
         } catch (error) {
             console.error("Error during initialization:", error);

@@ -19,7 +19,7 @@ const getQueryParam = (param) => {
     return urlParams.get(param);
 };
 
-// Function to initialize the Card Component
+// Function to initialize the Klarna Component
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("DOM fully loaded and parsed.");
 
@@ -44,9 +44,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.querySelector(".input-container").style.display = "none";
         startPaymentButton.style.display = "none";
 
-        const countryCode = document.getElementById("countryCode")?.value || "JP";
-        const currency = document.getElementById("currency")?.value || "JPY";
-        const value = parseInt(document.getElementById("amount")?.value || "5000", 10);
+        const countryCode = document.getElementById("countryCode")?.value || "NL";
+        const currency = document.getElementById("currency")?.value || "EUR";
+        const value = parseInt(document.getElementById("amount")?.value || "2000", 10);
         const reference = document.getElementById("reference")?.value;
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
         const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
@@ -77,65 +77,23 @@ document.addEventListener("DOMContentLoaded", async () => {
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
-            // paymentMethodsResponse.paymentMethods array check
             if (!Array.isArray(paymentMethodsResponse.paymentMethods)) {
                 console.error("Error: paymentMethodsResponse.paymentMethods is not an array", paymentMethodsResponse.paymentMethods);
             } else {
                 console.log("paymentMethodsResponse.paymentMethods:", paymentMethodsResponse.paymentMethods);
             }
-
-            // Define style object
-            var styleObject = {
-              base: {
-                color: '#000',
-                background: '#ccffe5', 
-                boxShadow: '0 4px 0 0 #007bff',
-                paddingBottom: '8px'
-              },
-              focus: {
-                boxShadow: '0 4px 0 0 #00bcd4'
-              },
-              error: {
-                boxShadow: '0 4px 0 0 red'
-              },
-              placeholder: {
-                color: '#aaa'
-              }
-            };
             
-            // Card component configuration
-            const cardConfiguration = {
-                hasHolderName: false,
-                enableStoreDetails: false,
-                brands: ['visa','mc'],
-                challengeWindowSize,
-                onFieldValid: (cbObj) => {
-                    console.log("### card::onFieldValid:: calling:",cbObj);
-                },
-                onBinValue: (cbObj) => {
-                    console.log("### card::onBinValue:: calling:",cbObj);
-                },
-                onBinLookup: (cbObj) => {
-                    console.log("### card::onBinLookup:: calling:",cbObj);
-                } 
-            };
-            console.log("Card Configuration:", cardConfiguration);
-
-            const translations = {
-                "ja-JP": {
-                    "payButton": "このカードを登録",
-                    "form.instruction": ""
-                }
+            const klarnaConfiguration = {
+                useKlarnaWidget: true // When set to true, the Klarna widget is shown. Set to false or leave the configuration object out to initiate a redirect flow.
             };
 
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
-                locale: "ja-JP",
-                translations,
-                showPayButton: true,
+                locale: "en-US",
                 environment: config.environment,
                 countryCode,
+                shopperLocale:"en_US",
                 onChange: updateStateContainer,
                 onSubmit: async (state, component, actions) => {
                     console.log('### card::onSubmit:: calling');
@@ -147,20 +105,50 @@ document.addEventListener("DOMContentLoaded", async () => {
                             ...state.data,
                             reference,
                             amount: { currency, value },
+                            countryCode,
                             shopperReference,
                             shopperEmail,
                             returnUrl,
                             origin,
                             channel: "Web",
-                            ...(nativeThreeDS && {
-                                authenticationData: {
-                                    threeDSRequestData: {
-                                        nativeThreeDS
+                            billingAddress: {
+                                city: "Gravenhage",
+                                country: "NL",
+                                houseNumberOrName: "1",
+                                postalCode: "2521VA",
+                                street: "Neherkade"
+                            },
+                            deliveryAddress: {
+                                city: "Gravenhage",
+                                country: "NL",
+                                houseNumberOrName: "1",
+                                postalCode: "2521VA",
+                                street: "Neherkade"
+                            },
+                            lineItems: [
+                                    {
+                                        quantity: "1",
+                                        amountExcludingTax: "331",
+                                        taxPercentage: "2100",
+                                        description: "Shoes",
+                                        id: "Item #1",
+                                        taxAmount: "69",
+                                        amountIncludingTax: "400",
+                                        productUrl: "https://example.com/shoes",
+                                        imageUrl: "https://example.com/shoes.jpg"
+                                    },
+                                    {
+                                        quantity: "2",
+                                        amountExcludingTax: "248",
+                                        taxPercentage: "2100",
+                                        description: "Socks",
+                                        id: "Item #2",
+                                        taxAmount: "52",
+                                        amountIncludingTax: "300",
+                                        productUrl: "https://example.com/socks",
+                                        imageUrl: "https://example.com/socks.jpg"
                                     }
-                                }
-                            }),
-                            storePaymentMethod: true,
-                            recurringProcessingModel
+                                ]
                         };
 
                         updatePaymentsLog("Payment Request", paymentsReqData);
@@ -209,8 +197,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const { resultCode, action } = result;
 
                         console.log("Handling additional details:", { resultCode, action });
-                        //actions.resolve({ resultCode });
-                        actions.resolve({ resultCode, action });
+                        actions.resolve({ resultCode });
+                        //actions.resolve({ resultCode, action });
                     } catch (error) {
                         console.error("Additional details processing error:", error);
                         actions.reject();
@@ -221,7 +209,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     console.log("### card::onPaymentCompleted:: calling");
                     console.log(result);
 
-                    const cardContainer = document.getElementById("card-container");
+                    const cardContainer = document.getElementById("klarna-container");
                     cardContainer.innerHTML = `
                         <h2>Payment Result</h2>
                         <p><strong>Status:</strong> ${result.resultCode}</p>
@@ -230,11 +218,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             };
 
-            //const { AdyenCheckout, Card } = window.AdyenWeb;
+            const { AdyenCheckout, Klarna } = window.AdyenWeb;
             const checkout = await AdyenCheckout(configObj);
-            //const card = new Card(checkout,cardConfiguration).mount("#card-container");
-            const cardComponent = checkout.create("card", cardConfiguration);
-            cardComponent.mount("#card-container");
+            const klarna = new Klarna(checkout,klarnaConfiguration).mount("#klarna-container");
 
         } catch (error) {
             console.error("Error during initialization:", error);

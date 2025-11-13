@@ -44,15 +44,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.querySelector(".input-container").style.display = "none";
         startPaymentButton.style.display = "none";
 
-        const countryCode = document.getElementById("countryCode")?.value || "NL";
-        const currency = document.getElementById("currency")?.value || "EUR";
+        const countryCode = document.getElementById("countryCode")?.value || "GB";
+        const telephoneNumber = document.getElementById("telephoneNumber")?.value || "+447755564318";
+        const currency = document.getElementById("currency")?.value || "GBP";
         const value = parseInt(document.getElementById("amount")?.value || "2000", 10);
         const reference = document.getElementById("reference")?.value;
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
         const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
         const origin = window.location.origin;
         const shopperReference = document.getElementById("shopperReference")?.value || "guest";
-        const shopperEmail = document.getElementById("shopperEmail")?.value || "test@example.com";
+        const shopperEmail = document.getElementById("shopperEmail")?.value || "customer@email.uk";
         const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
         const challengeWindowSize = document.getElementById("challengeWindowSize")?.value || "02";
 
@@ -84,6 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             
             const klarnaConfiguration = {
+                type: "klarna_account",
                 useKlarnaWidget: true // When set to true, the Klarna widget is shown. Set to false or leave the configuration object out to initiate a redirect flow.
             };
 
@@ -106,47 +108,32 @@ document.addEventListener("DOMContentLoaded", async () => {
                             reference,
                             amount: { currency, value },
                             countryCode,
+                            telephoneNumber,
                             shopperReference,
                             shopperEmail,
                             returnUrl,
                             origin,
                             channel: "Web",
                             billingAddress: {
-                                city: "Gravenhage",
-                                country: "NL",
-                                houseNumberOrName: "1",
-                                postalCode: "2521VA",
-                                street: "Neherkade"
+                                city: "London",
+                                country: "GB",
+                                houseNumberOrName: "Apt. 214",
+                                postalCode: "W1S 3BE",
+                                street: "10 New Burlington Street"
                             },
                             deliveryAddress: {
-                                city: "Gravenhage",
-                                country: "NL",
-                                houseNumberOrName: "1",
-                                postalCode: "2521VA",
-                                street: "Neherkade"
+                                city: "London",
+                                country: "GB",
+                                houseNumberOrName: "Apt. 214",
+                                postalCode: "W1S 3BE",
+                                street: "10 New Burlington Street"
                             },
                             lineItems: [
                                     {
                                         quantity: "1",
-                                        amountExcludingTax: "331",
-                                        taxPercentage: "2100",
                                         description: "Shoes",
-                                        id: "Item #1",
-                                        taxAmount: "69",
-                                        amountIncludingTax: "400",
-                                        productUrl: "https://example.com/shoes",
-                                        imageUrl: "https://example.com/shoes.jpg"
-                                    },
-                                    {
-                                        quantity: "2",
-                                        amountExcludingTax: "248",
-                                        taxPercentage: "2100",
-                                        description: "Socks",
-                                        id: "Item #2",
-                                        taxAmount: "52",
-                                        amountIncludingTax: "300",
-                                        productUrl: "https://example.com/socks",
-                                        imageUrl: "https://example.com/socks.jpg"
+                                        id: "Item #1"
+                                        //amountIncludingTax: "2000"
                                     }
                                 ]
                         };

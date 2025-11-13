@@ -283,7 +283,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 },
                 onAdditionalDetails: async (state, component, actions) => {
                     console.log("### card::onAdditionalDetails:: calling");
-                    console.log(state);
 
                     try {
                         const result = await makeDetails(state.data);
@@ -313,16 +312,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 onError: (error) => {
                     console.log("### card::onError:: calling");
                     console.log(error);
-                },
-                onPaymentCompleted: (result,component) => {
-                    console.log("### card::onPaymentCompleted:: calling");
-                    console.log(result);
-                    console.log(component);
-                },
-                onPaymentFailed: (result,component) => {
-                    console.log("### card::onPaymentFailed:: calling");
-                    console.log(result);
-                    console.log(component);
                 }
             };
 
