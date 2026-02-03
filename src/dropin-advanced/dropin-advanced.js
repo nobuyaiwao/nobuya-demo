@@ -123,6 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const pmReqConfig = {
             countryCode,
             amount: { currency, value },
+            blockedPaymentMethods : ["wechatpayQR","wechatpayMiniProgram","wechatpaySDK"],
             shopperReference,
             shopperEmail
         };

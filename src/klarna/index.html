@@ -18,7 +18,7 @@
     <link rel="stylesheet"
      href="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.8.0/adyen.css">
 
-    <link rel="stylesheet" href="./override.css">
+    <link rel="stylesheet" href="./klarna.css">
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -26,11 +26,52 @@
         <div class="left-panel">
             <h1>Klarna Component (Advanced Flow)</h1>
             <div class="input-container">
+                <label for="country">Country:</label>
+                <select id="country">
+                    <option value="">-- Select --</option>
+                
+                    <!-- EU / EEA countries -->
+                    <option value="AT">Austria (AT)</option>
+                    <option value="BE">Belgium (BE)</option>
+                    <option value="CZ">Czech Republic (CZ)</option>
+                    <option value="DK">Denmark (DK)</option>
+                    <option value="FI">Finland (FI)</option>
+                    <option value="FR">France (FR)</option>
+                    <option value="DE">Germany (DE)</option>
+                    <option value="GR">Greece (GR)</option>
+                    <option value="HU">Hungary (HU)</option>
+                    <option value="IE">Ireland (IE)</option>
+                    <option value="IT">Italy (IT)</option>
+                    <option value="NL">Netherlands (NL)</option>
+                    <option value="NO">Norway (NO)</option>
+                    <option value="PL">Poland (PL)</option>
+                    <option value="PT">Portugal (PT)</option>
+                    <option value="RO">Romania (RO)</option>
+                    <option value="SK">Slovakia (SK)</option>
+                    <option value="ES">Spain (ES)</option>
+                    <option value="SE">Sweden (SE)</option>
+                    <option value="CH">Switzerland (CH)</option>
+                
+                    <!-- UK -->
+                    <option value="GB" selected>United Kingdom (GB)</option>
+                
+                    <!-- North America -->
+                    <option value="US">United States (US)</option>
+                    <option value="CA">Canada (CA)</option>
+                    <option value="MX">Mexico (MX)</option>
+                
+                    <!-- Oceania -->
+                    <option value="AU">Australia (AU)</option>
+                    <option value="NZ">New Zealand (NZ)</option>
+                </select>
+
+
                 <label for="countryCode">Country Code</label>
                 <input type="text" id="countryCode" value="GB">
 
                 <label for="currency">Currency</label>
                 <input type="text" id="currency" value="GBP">
+
 
                 <label for="amount">Amount</label>
                 <input type="number" id="amount" value="2000">
@@ -41,18 +82,30 @@
                 <label for="returnUrl">Return URL</label>
                 <input type="text" id="returnUrl" placeholder="Generating..." value="">
 
-                <label for="nativeThreeDS">Enable 3DS Native</label>
+                <label for="storePaymentMethod">Store Payment Methode</label>
                 <label class="switch">
-                    <input type="checkbox" id="nativeThreeDS" checked>
+                    <input type="checkbox" id="storePaymentMethod" checked>
                     <span class="slider round"></span>
                 </label>
 
                 <div class="input-group">
+                    <label for="klarnaOption">Klarna Option:</label>
+                    <select id="klarnaOption">
+                        <option value="klarna_paynow" selected>Klarna Pay Now</option>
+                        <option value="klarna">Klarna Buy Now Pay Later</option>
+                        <option value="klarna_account">Klarna Pay Over Time</option>
+                    </select>
+                    <label for="shopperLocale">Shopper Locale:</label>
+                    <input type="text" id="shopperLocale" value="en-GP" placeholder="Enter shopper locale">
                     <label for="shopperReference">Shopper Reference:</label>
                     <input type="text" id="shopperReference" value="nobuya-demo-user" placeholder="Enter shopper ID">
                     <label for="shopperEmail">Shopper e-mail:</label>
                     <input type="text" id="shopperEmail" value="customer@email.uk" placeholder="Enter shopper e-mail">
+                    <label for="telephoneNumber">Shopper phone number:</label>
                     <input type="text" id="telephoneNumber" value="+447755564318" placeholder="Enter shopper phone number">
+
+                    <input type="hidden" id="shopperAddress">
+
                     <label for="recurringProcessingModel">Recurring Model:</label>
                     <select id="recurringProcessingModel">
                         <option value="CardOnFile" selected>Card On File</option>
@@ -69,6 +122,348 @@
                     </select>
                 </div>
             </div>
+
+<script>
+    const countrySelect = document.getElementById("country");
+    const countryCode = document.getElementById("countryCode");
+    const currency = document.getElementById("currency");
+    const shopperReference = document.getElementById("shopperReference");
+    const shopperEmail = document.getElementById("shopperEmail");
+    const telephoneNumber = document.getElementById("telephoneNumber");
+    const shopperAddress = document.getElementById("shopperAddress");
+
+    // country specific data
+    const countryData = {
+      AT: {
+        countryCode: "AT",
+        currency: "EUR",
+        shopperLocale: "de-AT",
+        shopperReference: "klarna-test-AT",
+        shopperEmail: "customer@email.at",
+        telephoneNumber: "+4306762600456"
+      },
+      BE: {
+        countryCode: "BE",
+        currency: "EUR",
+        shopperLocale: "nl-BE",
+        shopperReference: "klarna-test-BE",
+        shopperEmail: "customer@email.be",
+        telephoneNumber: "+32485121291"
+      },
+      CZ: {
+        countryCode: "CZ",
+        currency: "CZK",
+        shopperLocale: "cs-CZ",
+        shopperReference: "klarna-test-CZ",
+        shopperEmail: "customer@email.cz",
+        telephoneNumber: "+420771613715"
+      },
+      DK: {
+        countryCode: "DK",
+        currency: "DKK",
+        shopperLocale: "da-DK",
+        shopperReference: "klarna-test-DK",
+        shopperEmail: "customer@email.dk",
+        telephoneNumber: "+4542555628"
+      },
+      FI: {
+        countryCode: "FI",
+        currency: "EUR",
+        shopperLocale: "fi-FI",
+        shopperReference: "klarna-test-FI",
+        shopperEmail: "customer@email.fi",
+        telephoneNumber: "+358401234567"
+      },
+      FR: {
+        countryCode: "FR",
+        currency: "EUR",
+        shopperLocale: "fr-FR",
+        shopperReference: "klarna-test-FR",
+        shopperEmail: "customer@email.fr",
+        telephoneNumber: "+33689854321"
+      },
+      DE: {
+        countryCode: "DE",
+        currency: "EUR",
+        shopperLocale: "de-DE",
+        shopperReference: "klarna-test-DE",
+        shopperEmail: "customer@email.de",
+        telephoneNumber: "+49017614284340"
+      },
+      NL: {
+        countryCode: "NL",
+        currency: "EUR",
+        shopperLocale: "nl-NL",
+        shopperReference: "klarna-test-NL",
+        shopperEmail: "customer@email.nl",
+        telephoneNumber: "+31201234567"
+      },
+      IE: {
+        countryCode: "IE",
+        currency: "EUR",
+        shopperLocale: "en-IE",
+        shopperReference: "klarna-test-IE",
+        shopperEmail: "customer@email.ie",
+        telephoneNumber: "+35316001234"
+      },
+      IT: {
+        countryCode: "IT",
+        currency: "EUR",
+        shopperLocale: "it-IT",
+        shopperReference: "klarna-test-IT",
+        shopperEmail: "customer@email.it",
+        telephoneNumber: "+390612345678"
+      },
+      ES: {
+        countryCode: "ES",
+        currency: "EUR",
+        shopperLocale: "es-ES",
+        shopperReference: "klarna-test-ES",
+        shopperEmail: "customer@email.es",
+        telephoneNumber: "+34912345678"
+      },
+      SE: {
+        countryCode: "SE",
+        currency: "SEK",
+        shopperLocale: "sv-SE",
+        shopperReference: "klarna-test-SE",
+        shopperEmail: "customer@email.se",
+        telephoneNumber: "+46701234567"
+      },
+      NO: {
+        countryCode: "NO",
+        currency: "NOK",
+        shopperLocale: "nb-NO",
+        shopperReference: "klarna-test-NO",
+        shopperEmail: "customer@email.no",
+        shopperertivtry: "+4723456789"
+      },
+      CH: {
+        countryCode: "CH",
+        currency: "CHF",
+        shopperLocale: "de-CH",
+        shopperReference: "klarna-test-CH",
+        shopperEmail: "customer@email.ch",
+        telephoneNumber: "+41441234567"
+      },
+      GB: {
+        countryCode: "GB",
+        currency: "GBP",
+        shopperLocale: "en-GB",
+        shopperReference: "klarna-test-GB",
+        shopperEmail: "customer@email.uk",
+        telephoneNumber: "+447755564318"
+      }
+      // — Klarna sample list に含まれていなかった国は、必要に応じて追加するかダミー値にしてください —
+    };
+
+    // shopperAddress by country
+    const shopperAddressByCountry = {
+        AT: {
+            city: "Wien",
+            country: "AT",
+            houseNumberOrName: "47",
+            postalCode: "1060",
+            street: "Mariahilfer Straße"
+        },
+        BE: {
+            city: "Brussel",
+            country: "BE",
+            houseNumberOrName: "1",
+            postalCode: "1000",
+            street: "Grote Markt"
+        },
+        CZ: {
+            city: "Praha",
+            country: "CZ",
+            houseNumberOrName: "1480/11",
+            postalCode: "155 00",
+            street: "Zazvorkova"
+        },
+        DK: {
+            city: "København Ø",
+            country: "DK",
+            houseNumberOrName: "7",
+            postalCode: "1556",
+            street: "Dantes Plads"
+        },
+        FI: {
+            city: "Helsinki",
+            country: "FI",
+            houseNumberOrName: "34",
+            postalCode: "00100",
+            street: "Mannerheimintie"
+        },
+        FR: {
+            city: "Paris",
+            country: "FR",
+            houseNumberOrName: "33",
+            postalCode: "75009",
+            street: "rue la Fayette"
+        },
+        DE: {
+            city: "Berlin",
+            country: "DE",
+            houseNumberOrName: "2",
+            postalCode: "10178",
+            street: "Neue Schönhauser Str."
+        },
+        GR: {
+            city: "Athina",
+            country: "GR",
+            houseNumberOrName: "37",
+            postalCode: "151 23",
+            street: "Kephisias"
+        },
+        HU: {
+            city: "Budapest",
+            country: "HU",
+            houseNumberOrName: "2",
+            postalCode: "1083",
+            street: "Ludovika tér"
+        },
+        IE: {
+            city: "Dublin",
+            country: "IE",
+            houseNumberOrName: "30",
+            postalCode: "D02 C838",
+            street: "King Street South"
+        },
+        IT: {
+            city: "Roma",
+            country: "IT",
+            houseNumberOrName: "150",
+            postalCode: "00146",
+            street: "Via Enrico Fermi"
+        },
+        NL: {
+            city: "Amsterdam",
+            country: "NL",
+            houseNumberOrName: "137",
+            postalCode: "1068 SR",
+            street: "Osdorpplein"
+        },
+        NO: {
+            city: "Oslo",
+            country: "NO",
+            houseNumberOrName: "1",
+            postalCode: "0194",
+            street: "Edvard Munchs Plass"
+        },
+        PL: {
+            city: "Warszawa",
+            country: "PL",
+            houseNumberOrName: "124",
+            postalCode: "01-460",
+            street: "Ul. Górczewska"
+        },
+        PT: {
+            city: "Lisboa",
+            country: "PT",
+            houseNumberOrName: "40",
+            postalCode: "1990-094",
+            street: "Avenida Dom João II"
+        },
+        RO: {
+            city: "București",
+            country: "RO",
+            houseNumberOrName: "35",
+            postalCode: "061357",
+            street: "Drumul Taberei"
+        },
+        SK: {
+            city: "Bratislava",
+            country: "SK",
+            houseNumberOrName: "2",
+            postalCode: "810 06",
+            street: "Vajanského nábrežie"
+        },
+        ES: {
+            city: "Madrid",
+            country: "ES",
+            houseNumberOrName: "27",
+            postalCode: "28012",
+            street: "C. de Atocha"
+        },
+        SE: {
+            city: "Stockholm",
+            country: "SE",
+            houseNumberOrName: "2",
+            postalCode: "11 148",
+            street: "Södra Blasieholmshamnen"
+        },
+        CH: {
+            city: "Basel",
+            country: "CH",
+            houseNumberOrName: "2",
+            postalCode: "4051",
+            street: "Augustinergasse"
+        },
+        GB: {
+            city: "London",
+            country: "GB",
+            houseNumberOrName: "10",
+            postalCode: "W1S 3BE",
+            street: "New Burlington Street"
+        },
+        US: {
+            city: "New York",
+            country: "US",
+            houseNumberOrName: "509",
+            postalCode: "10024-3941",
+            street: "Amsterdam Ave"
+        },
+        CA: {
+            city: "North Vancouver",
+            country: "CA",
+            houseNumberOrName: "2693",
+            postalCode: "V7H 1L9",
+            street: "Byron Rd"
+        },
+        MX: {
+            city: "Benito Juárez",
+            country: "MX",
+            houseNumberOrName: "462",
+            postalCode: "03000",
+            street: "Av Cuauhtémoc"
+        },
+        AU: {
+            city: "Port Douglas",
+            country: "AU",
+            houseNumberOrName: "4",
+            postalCode: "4877",
+            street: "Wharf St"
+        },
+        NZ: {
+            city: "Auckland",
+            country: "NZ",
+            houseNumberOrName: "286",
+            postalCode: "6011",
+            street: "Mount Wellington Highway"
+        }
+    };
+
+    countrySelect.addEventListener("change", () => {
+        const country = countrySelect.value;
+
+        if (!country) {
+            return;
+        }
+
+        countryCode.value = countryData[country].countryCode;
+        shopperLocale.value = countryData[country].shopperLocale;
+        currency.value = countryData[country].currency;
+        shopperReference.value = countryData[country].shopperReference;
+        shopperEmail.value = countryData[country].shopperEmail;
+        telephoneNumber.value = countryData[country].telephoneNumber;
+
+        shopperAddress.value = JSON.stringify(shopperAddressByCountry[country]);
+        console.log(country);
+        console.log(countryCode);
+        console.log(shopperAddress.value);
+    });
+
+</script>
 
             <button id="start-payment">Here we go!</button>
             <!--div class="card-wrapper">

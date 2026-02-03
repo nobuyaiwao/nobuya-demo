@@ -178,8 +178,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Mount stored card payment method
             const storedPaymentMethod = checkout.paymentMethodsResponse.storedPaymentMethods[0];
             const storedCardComponent = new Card(checkout,{
-                ...storedPaymentMethod,
-                hideCVC: true
+                ...storedPaymentMethod
+                //hideCVC: true
             }).mount("#stored-card-container");
 
         } catch (error) {

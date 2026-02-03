@@ -54,6 +54,32 @@ export const fetchPaymentMethods = async (options) => {
     }
 };
 
+// 🔹 Fetch stored payment methods from the backend
+export const fetchStoredPaymentMethods = async (options) => {
+    try {
+        console.log(JSON.stringify(options));
+        
+        const response = await fetch("/api/storedPaymentMethods", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(options)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch stored payment methods: ${response.statusText}`);
+        }
+
+        const storedPaymentMethods = await response.json();
+        console.log("Stored payment methods received:", storedPaymentMethods);
+
+        return storedPaymentMethods;
+
+    } catch (error) {
+        console.error("Error fetching stored payment methods:", error);
+        return null;
+    }
+};
+
 // 🔹 Get Client Key and Environment from /api/config
 export const getClientConfig = async () => {
     try {
@@ -176,7 +202,11 @@ export const overrideConsoleLog = () => {
     const originalConsoleLog = console.log;
     console.log = (...args) => {
         originalConsoleLog(...args); 
-        const logMessage = args.map(arg => JSON.stringify(arg, null, 2)).join(" ");
+        //const logMessage = args.map(arg => JSON.stringify(arg, null, 2)).join(" ");
+        const logMessage = args.map(arg => 
+            typeof arg === "string" ? arg : String(arg)
+        ).join(" ");
+
         updateConsoleContainer(logMessage, "log");
     };
 

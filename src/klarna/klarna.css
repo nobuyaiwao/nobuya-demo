@@ -1,0 +1,39 @@
+/* 親：縦に並べる */
+.stored-klarna-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+/* 各行：brand / id / button の横並び */
+.stored-klarna-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+/* brand */
+.stored-klarna-brand {
+    font-weight: 500;
+    width: 140px;          /* 揃えるなら固定幅が綺麗 */
+    word-break: break-word;
+}
+
+/* id */
+.stored-klarna-id {
+    font-family: monospace;
+    font-size: 13px;
+    flex: 1;
+    word-break: break-all;
+}
+
+/* button */
+.stored-klarna-button {
+    padding: 6px 12px;
+    flex-shrink: 0;
+}
+

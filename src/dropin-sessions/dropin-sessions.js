@@ -88,6 +88,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const config = await getClientConfig();
             if (!config) throw new Error("Failed to load client config");
+            
+            // Card Configuration
+            const cardConfiguration = {
+                hasHolderName: true,
+                showStoredPaymentMethods: true,
+                enableStoreDetails: true
+            };
 
             // 🔹 globalConfiguration の作成
             const globalConfiguration = {
@@ -117,6 +124,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             const dropinConfiguration = {
                 //paymentMethodComponents: [Card, PayPal, GooglePay, ApplePay, Ideal],
                 instantPaymentTypes: ['applepay', 'googlepay'],
+                paymentMethodsConfiguration : {
+                    card : cardConfiguration
+                    //applepay : applepayConfiguration
+                },
                 onReady: () => {
                     console.log("Drop-in is ready");
                 }

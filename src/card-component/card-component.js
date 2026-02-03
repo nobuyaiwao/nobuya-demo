@@ -74,7 +74,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             const config = await getClientConfig();
             if (!config) throw new Error("Failed to load client config");
 
+            //const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
+            
+            const scheme = paymentMethodsResponse.paymentMethods
+                .find(pm => pm.type === 'scheme');
+            
+            if (scheme) {
+                scheme.brands = ['visa', 'mc'];
+            }
+
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
             // paymentMethodsResponse.paymentMethods array check
@@ -131,7 +140,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 hasHolderName: true,
                 enableStoreDetails: true,
                 //hideCVC: true,
-                brands: ['visa','mc'],
+                //brands: ['mc','visa'],
                 //clickToPayConfiguration: {
                 //    "merchantDisplayName" : "CTP Merchant Name",
                 //    shopperEmail
@@ -253,6 +262,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                 },
                 onAdditionalDetails: async (state, component, actions) => {
                     console.log("### card::onAdditionalDetails:: calling");
+                    //console.log(state.data.details.threeDSResult);
+                    const b64 = state.data.details.threeDSResult;
+                    
+                    try {
+                        const jsonString = atob(b64);
+                        const obj = JSON.parse(jsonString);
+                    
+                        console.log("threeDSResult (decoded, pretty):");
+                        console.log(JSON.stringify(obj, null, 2)); 
+                    
+                    } catch (e) {
+                        console.error("Decode error:", e);
+                    }
 
                     try {
                         updatePaymentsLog("Details Request", state.data);
@@ -268,8 +290,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const { resultCode, action } = result;
 
                         console.log("Handling additional details:", { resultCode, action });
-                        actions.resolve({ resultCode });
-                        //actions.resolve({ resultCode, action });
+                        //actions.resolve({ resultCode });
+                        actions.resolve({ resultCode, action });
                     } catch (error) {
                         console.error("Additional details processing error:", error);
                         actions.reject();

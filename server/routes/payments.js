@@ -99,5 +99,42 @@ router.post("/payments/details", async (req, res) => {
     }
 });
 
+// 🔹 Fetch stored payment methods (Front → POST, Adyen → GET)
+router.post("/storedPaymentMethods", async (req, res) => {
+    try {
+        const { shopperReference } = req.body;
+
+        if (!shopperReference) {
+            return res.status(400).json({ error: "Missing shopperReference" });
+        }
+
+        // Adyen GET に渡す query parameters
+        const params = {
+            merchantAccount: process.env.ADYEN_MERCHANT_ACCOUNT,
+            shopperReference
+        };
+
+        console.log("Calling Adyen /storedPaymentMethods with params:", params);
+
+        const response = await axios.get(`${ADYEN_API_URL}/storedPaymentMethods`, {
+            params,
+            headers: {
+                "X-API-Key": process.env.ADYEN_API_KEY,
+                "Content-Type": "application/json"
+            }
+        });
+
+        console.log("Adyen /storedPaymentMethods response:", JSON.stringify(response.data, null, 2));
+        res.json(response.data);
+
+    } catch (error) {
+        console.error("Error fetching stored payment methods:", error.response?.data || error.message);
+        res.status(error.response?.status || 500).json({
+            error: "Failed to fetch stored payment methods"
+        });
+    }
+});
+
+
 module.exports = router;
 
