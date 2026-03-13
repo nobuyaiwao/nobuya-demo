@@ -107,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const reference = document.getElementById("reference")?.value;
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
         const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
+        const storePaymentMethod = document.getElementById("storePaymentMethod")?.checked ? true : false;
         const origin = window.location.origin;
         const shopperReference = document.getElementById("shopperReference")?.value || "guest";
         const shopperEmail = document.getElementById("shopperEmail")?.value || "user@test.local";
@@ -254,6 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             returnUrl,
                             origin,
                             channel: "Web",
+                            storePaymentMethod : storePaymentMethod,
                             ...(nativeThreeDS && {
                                 authenticationData: {
                                     threeDSRequestData: {
@@ -261,9 +263,11 @@ document.addEventListener("DOMContentLoaded", () => {
                                     }
                                 }
                             }),
-                            //storePaymentMethod: true,       // ??
-                            recurringProcessingModel,
-                            ...(state.data.paymentMethod?.storedPaymentMethodId && { shopperInteraction: "ContAuth" })
+                            //recurringProcessingModel,
+                            //...(state.data.paymentMethod?.storedPaymentMethodId && { shopperInteraction: "ContAuth" })
+                            shopperInteraction: state.data.paymentMethod?.storedPaymentMethodId
+                                ? "ContAuth"
+                                : "Ecommerce"
                         };
 
                         const { action, resultCode } = await makePayment(paymentsReqData);
