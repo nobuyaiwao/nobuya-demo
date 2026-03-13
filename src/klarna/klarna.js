@@ -60,19 +60,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     startPaymentButton.addEventListener("click", async () => {
         console.log("Here we go! button clicked.");
 
+        const klarnaOption = document.getElementById("klarnaOption")?.value ;
+
+        if (!klarnaOption) {
+            alert("Please select a Klarna payment option.");
+            return;
+        }
+
         document.querySelector(".input-container").style.display = "none";
         startPaymentButton.style.display = "none";
 
         const countryCode = document.getElementById("countryCode")?.value || "GB";
-        const telephoneNumber = document.getElementById("telephoneNumber")?.value || "+447755564318";
+        const telephoneNumber = document.getElementById("telephoneNumber")?.value ;//|| "+447755564318";
         const currency = document.getElementById("currency")?.value || "GBP";
-        const value = parseInt(document.getElementById("amount")?.value || "2000", 10);
+        const value = parseInt(document.getElementById("amount")?.value || "20000", 10);
         const reference = document.getElementById("reference")?.value;
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
         const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
         const storePaymentMethod = document.getElementById("storePaymentMethod")?.checked ? true : false;
         const origin = window.location.origin;
-        const klarnaOption = document.getElementById("klarnaOption")?.value || "klarna_paynow";
         const shopperLocale = document.getElementById("shopperLocale")?.value || "en-GB";
         const shopperReference = document.getElementById("shopperReference")?.value || "guest";
         const shopperEmail = document.getElementById("shopperEmail")?.value || "customer@email.uk";
@@ -92,6 +98,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const pmReqConfig = {
             countryCode,
             amount: { currency, value },
+            allowedPaymentMethods: [ klarnaOption ],
             shopperEmail,
             shopperReference,
             shopperLocale
@@ -109,6 +116,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const paymentMethodsResponse = await fetchPaymentMethods(pmReqConfig);
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
+
+            // Check if klarnaOption exists in paymentMethods array
+            const exists = paymentMethodsResponse.paymentMethods.some(
+                pm => pm.type === klarnaOption
+            );
+            
+            if (!exists) {
+                alert("Selected Klarna option is not available.");
+                //return;
+            }
 
             renderStoredKlarnaMethods(shopperReference);
             //const storedPaymentMethodsResponse = await fetchStoredPaymentMethods(storedPmConfig);
@@ -143,9 +160,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                             reference,
                             amount: { currency, value },
                             countryCode,
-                            //telephoneNumber,
+                            telephoneNumber,
                             shopperReference,
-                            //shopperEmail,
+                            shopperLocale,
+                            shopperEmail,
                             returnUrl,
                             origin,
                             channel: "Web",
@@ -156,28 +174,28 @@ document.addEventListener("DOMContentLoaded", async () => {
                             lineItems: [
                                 {
                                   quantity: "1",
-                                  amountExcludingTax: "2000",
+                                  amountExcludingTax: "20000",
                                   //taxPercentage: "2000",
                                   description: "Shoes",
                                   id: "Item #1",
-                                  taxAmount: "400",
-                                  amountIncludingTax: "2400"
+                                  taxAmount: "4000",
+                                  amountIncludingTax: "24000"
                                 },
                                 {
                                   quantity: "2",
-                                  amountExcludingTax: "500",
+                                  amountExcludingTax: "5000",
                                   //taxPercentage: "2000",
                                   description: "Socks",
                                   id: "Item #2",
-                                  taxAmount: "100",
-                                  amountIncludingTax: "600"
+                                  taxAmount: "1000",
+                                  amountIncludingTax: "6000"
                                 },
                                 // The following line item specifies the discount
                                 {
                                   quantity: "1",
                                   description: "Point redemption",
                                   id: "Point-Reddmption",
-                                  amountIncludingTax: "-1600"
+                                  amountIncludingTax: "-16000"
                                 }
                               ]
                             //lineItems: [

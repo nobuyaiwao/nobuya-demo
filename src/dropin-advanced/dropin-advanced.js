@@ -140,14 +140,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // card configuration
             const cardConfiguration = {
+                brands : [ 'discover', 'visa', 'jcb' , 'mc' ],
                 hasHolderName: true,
                 showStoredPaymentMethods: true, 
-                enableStoreDetails: true,
-                enableClickToPay: true,
-                clickToPayConfiguration: {
-                    merchantDisplayName : "Click To Pay Merchant Name",
-                    shopperEmail
-                }
+                enableStoreDetails: true
+                //enableClickToPay: true,
+                //clickToPayConfiguration: {
+                //    merchantDisplayName : "Click To Pay Merchant Name",
+                //    shopperEmail
+                //}
             };
             console.log(cardConfiguration);
 

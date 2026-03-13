@@ -80,9 +80,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             const scheme = paymentMethodsResponse.paymentMethods
                 .find(pm => pm.type === 'scheme');
             
-            if (scheme) {
-                scheme.brands = ['visa', 'mc'];
-            }
+            //if (scheme) {
+            //    scheme.brands = ['visa', 'mc'];
+            //}
 
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 hasHolderName: true,
                 enableStoreDetails: true,
                 //hideCVC: true,
-                //brands: ['mc','visa'],
+                brands: ['discover', 'mc','visa'],
                 //clickToPayConfiguration: {
                 //    "merchantDisplayName" : "CTP Merchant Name",
                 //    shopperEmail

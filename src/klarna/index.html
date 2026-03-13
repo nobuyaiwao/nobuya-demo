@@ -74,7 +74,7 @@
 
 
                 <label for="amount">Amount</label>
-                <input type="number" id="amount" value="2000">
+                <input type="number" id="amount" value="20000">
 
                 <label for="reference">Reference</label>
                 <input type="text" id="reference" readonly>
@@ -91,7 +91,8 @@
                 <div class="input-group">
                     <label for="klarnaOption">Klarna Option:</label>
                     <select id="klarnaOption">
-                        <option value="klarna_paynow" selected>Klarna Pay Now</option>
+                        <option value="" selected disabled>-- Select Klarna option --</option>
+                        <option value="klarna_paynow">Klarna Pay Now</option>
                         <option value="klarna">Klarna Buy Now Pay Later</option>
                         <option value="klarna_account">Klarna Pay Over Time</option>
                     </select>
@@ -190,13 +191,21 @@
         shopperEmail: "customer@email.de",
         telephoneNumber: "+49017614284340"
       },
+      GR: {
+        countryCode: "GR",
+        currency: "EUR",
+        shopperLocale: "el-GR",
+        shopperReference: "klarna-test-GR",
+        shopperEmail: "customer@email.gr",
+        telephoneNumber: "+306945553624"
+      },
       NL: {
         countryCode: "NL",
         currency: "EUR",
         shopperLocale: "nl-NL",
         shopperReference: "klarna-test-NL",
         shopperEmail: "customer@email.nl",
-        telephoneNumber: "+31201234567"
+        telephoneNumber: "+31689124321"
       },
       IE: {
         countryCode: "IE",
@@ -204,7 +213,7 @@
         shopperLocale: "en-IE",
         shopperReference: "klarna-test-IE",
         shopperEmail: "customer@email.ie",
-        telephoneNumber: "+35316001234"
+        telephoneNumber: "+353855351400"
       },
       IT: {
         countryCode: "IT",
@@ -212,7 +221,7 @@
         shopperLocale: "it-IT",
         shopperReference: "klarna-test-IT",
         shopperEmail: "customer@email.it",
-        telephoneNumber: "+390612345678"
+        telephoneNumber: "+393339741231"
       },
       ES: {
         countryCode: "ES",
@@ -220,7 +229,7 @@
         shopperLocale: "es-ES",
         shopperReference: "klarna-test-ES",
         shopperEmail: "customer@email.es",
-        telephoneNumber: "+34912345678"
+        telephoneNumber: "+34672563009"
       },
       SE: {
         countryCode: "SE",
@@ -228,7 +237,7 @@
         shopperLocale: "sv-SE",
         shopperReference: "klarna-test-SE",
         shopperEmail: "customer@email.se",
-        telephoneNumber: "+46701234567"
+        telephoneNumber: "+46701740615"
       },
       NO: {
         countryCode: "NO",
@@ -236,7 +245,47 @@
         shopperLocale: "nb-NO",
         shopperReference: "klarna-test-NO",
         shopperEmail: "customer@email.no",
-        shopperertivtry: "+4723456789"
+        telephoneNumber: "+4740123456"
+      },
+      PL: {
+        countryCode: "PL",
+        currency: "PLN",
+        shopperLocale: "pl-PL",
+        shopperReference: "klarna-test-PL",
+        shopperEmail: "customer@email.pl",
+        telephoneNumber: "+48795222223"
+      },
+      PT: {
+        countryCode: "PT",
+        currency: "EUR",
+        shopperLocale: "pt-PT",
+        shopperReference: "klarna-test-PT",
+        shopperEmail: "customer@email.pt",
+        telephoneNumber: "+351935556731"
+      },
+      RO: {
+        countryCode: "RO",
+        currency: "RON",
+        shopperLocale: "ro-RO",
+        shopperReference: "klarna-test-RO",
+        shopperEmail: "customer@email.ro",
+        telephoneNumber: "+40741209876"
+      },
+      ES: {
+        countryCode: "ES",
+        currency: "EUR",
+        shopperLocale: "es-ES",
+        shopperReference: "klarna-test-ES",
+        shopperEmail: "customer@email.es",
+        telephoneNumber: "+34672563009"
+      },
+      SE: {
+        countryCode: "SE",
+        currency: "SEK",
+        shopperLocale: "sv-SE",
+        shopperReference: "klarna-test-SE",
+        shopperEmail: "customer@email.se",
+        telephoneNumber: "+46701740615"
       },
       CH: {
         countryCode: "CH",
@@ -244,7 +293,7 @@
         shopperLocale: "de-CH",
         shopperReference: "klarna-test-CH",
         shopperEmail: "customer@email.ch",
-        telephoneNumber: "+41441234567"
+        telephoneNumber: "+41758680000"
       },
       GB: {
         countryCode: "GB",
@@ -253,6 +302,14 @@
         shopperReference: "klarna-test-GB",
         shopperEmail: "customer@email.uk",
         telephoneNumber: "+447755564318"
+      },
+      CA: {
+        countryCode: "CA",
+        currency: "CAD",
+        shopperLocale: "en-CA",
+        shopperReference: "klarna-test-GB",
+        shopperEmail: "customer@email.ca",
+        telephoneNumber: "+15197438620"
       }
       // — Klarna sample list に含まれていなかった国は、必要に応じて追加するかダミー値にしてください —
     };
@@ -458,8 +515,10 @@
         telephoneNumber.value = countryData[country].telephoneNumber;
 
         shopperAddress.value = JSON.stringify(shopperAddressByCountry[country]);
-        console.log(country);
-        console.log(countryCode);
+
+        console.log("Selected Country Code : " + countryCode.value);
+        //console.log(countryCode);
+        console.log(shopperLocale.value);
         console.log(shopperAddress.value);
     });
 
