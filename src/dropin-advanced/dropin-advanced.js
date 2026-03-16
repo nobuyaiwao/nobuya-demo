@@ -106,6 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const value = parseInt(document.getElementById("amount")?.value || "5000", 10);
         const reference = document.getElementById("reference")?.value;
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
+        const dropBrowserInfo = document.getElementById("dropBrowserInfo")?.checked ? true : false;
         const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
         const storePaymentMethod = document.getElementById("storePaymentMethod")?.checked ? true : false;
         const origin = window.location.origin;
@@ -247,8 +248,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     try {
                         document.getElementById("state-container").style.display = "none";
 
+                        const { browserInfo, ...rest } = state.data;
+
+                        console.log(dropBrowserInfo);
                         const paymentsReqData = {
-                            ...state.data,
+                            ...(dropBrowserInfo ? rest : state.data),
                             reference,
                             amount: { currency, value },
                             shopperReference,
