@@ -3,24 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drop-in (Session Flow)</title>
-
-<script src="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.18.0/adyen.js"
-     integrity="sha384-ZEPvk8M++Rrf/1zMUvnfdO73cZlnj/u9oAGHSeUIIgOXoW0ZrwfyB6pBcIrhDbdd"
+    <title>Drop-in (Sessions Flow)</title>
+    <script src="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.8.0/adyen.js"
+     integrity="sha384-bxVQwK8MZv5Nf5/TghsCZJ23F+FnlBAKG/6/8XE4SIThMQVLWys04oJ/HhJ+bXKD"
      crossorigin="anonymous"></script>
-
-<link rel="stylesheet"
-     href="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.18.0/adyen.css"
-     integrity="sha384-lCDmpxn4G68y4vohxVVEuRcbz4iZTDh1u/FLlsCV1wSbibWKs+knhLQpgzPBqap4"
+    <link rel="stylesheet"
+     href="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.8.0/adyen.css"
+     integrity="sha384-1wJDkAPA2mYXJa7x50LZnHo7oWi5ykc0h7co761i7dtY5Wg4LPCg2i/Q6xDQX02X"
      crossorigin="anonymous">
-
-
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <div class="container">
         <div class="left-panel">
-            <h1>Drop-in (Session Flow)</h1>
+            <h1>Drop-in (Sessions Flow)</h1>
             <div class="input-container">
                 <label for="countryCode">Country Code</label>
                 <input type="text" id="countryCode" value="JP">
@@ -37,29 +33,11 @@
                 <label for="returnUrl">Return URL</label>
                 <input type="text" id="returnUrl" placeholder="Generating..." value="">
 
-                <label for="storePaymentMethod">Store Payment Method</label>
-                <label class="switch">
-                    <input type="checkbox" id="storePaymentMethod">
-                    <span class="slider round"></span>
-                </label>
-
-                <label for="dropBrowserInfo">Drop browserInfo to escape 3D Secure</label>
-                <label class="switch">
-                    <input type="checkbox" id="dropBrowserInfo">
-                    <span class="slider round"></span>
-                </label>
-
-                <label for="nativeThreeDS">Enable 3DS Native</label>
-                <label class="switch">
-                    <input type="checkbox" id="nativeThreeDS" checked>
-                    <span class="slider round"></span>
-                </label>
-
                 <div class="input-group">
                     <label for="shopperReference">Shopper Reference:</label>
                     <input type="text" id="shopperReference" value="nobuya-demo-user" placeholder="Enter shopper ID">
                     <label for="shopperEmail">Shopper Email:</label>
-                    <input type="text" id="shopperEmail" value="user@test.local" placeholder="Enter shopper e-mail address">
+                    <input type="text" id="shopperEmail" value="user@test.local" placeholder="Enter shopper Email">
                     <label for="recurringProcessingModel">Recurring Model:</label>
                     <select id="recurringProcessingModel">
                         <option value="CardOnFile" selected>Card On File</option>
@@ -67,8 +45,6 @@
                         <option value="UnscheduledCardOnFile">Unscheduled Card On File</option>
                     </select>
                 </div>
-                
-
             </div>
             <button id="start-payment">Here we go!</button>
             <div id="dropin-container"></div>
@@ -77,15 +53,11 @@
                 <button onclick="window.location.href='../index.html'">Go Back</button>
                 <button onclick="window.location.reload();">Reload Page</button>
             </div>
-
         </div>
 
-
         <div class="right-panel">
-
-
             <h2>Debug Console</h2>
-        
+
             <!-- 🔹 Test Cards Section -->
             <pre id="shippingAddressOutput" style="display: none; height: 100px;">
                 Checking shopper's shipping contact from Apple Pay...
@@ -93,7 +65,6 @@
 
             <div id="test-cards-container"></div>
 
-        
             <!-- 🔹 Debug Sections -->
             <div class="debug-section">
                 <h3>Console Logs</h3>
@@ -108,9 +79,6 @@
                 <pre id="payments-container">No payment requests yet...</pre>
             </div>
         </div>
-
-
-
     </div>
 
     <script src="/test-cards.js"></script>
