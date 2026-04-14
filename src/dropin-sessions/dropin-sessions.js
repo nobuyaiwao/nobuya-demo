@@ -142,6 +142,7 @@ console.log("DOM fully loaded, initializing Drop-in Sessions...");
         const shopperReference = document.getElementById("shopperReference")?.value || "guest";
         const shopperEmail = document.getElementById("shopperEmail")?.value || "user@test.local";
         const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
+        const storePaymentMethod = document.getElementById("storePaymentMethod")?.checked ? true : false;
     
         if (isNaN(value) || value <= 0) {
             console.error("Invalid amount value. Please enter a valid number.");
@@ -155,6 +156,7 @@ console.log("DOM fully loaded, initializing Drop-in Sessions...");
             shopperEmail,
             reference,
             returnUrl,
+            storePaymentMethod,
             recurringProcessingModel,
             ...(nativeThreeDS && {
                     authenticationData: {

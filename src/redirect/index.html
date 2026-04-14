@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirect Result Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 24px;
+            background: #f7f7f7;
+            color: #222;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        h1, h2 {
+            margin-top: 0;
+        }
+
+        .meta-row {
+            margin-bottom: 8px;
+        }
+
+        .label {
+            display: inline-block;
+            min-width: 160px;
+            font-weight: bold;
+        }
+
+        pre {
+            background: #111;
+            color: #f1f1f1;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .success {
+            color: #0a7a2f;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #b00020;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #222;
+            color: #fff;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Redirect Result Viewer</h1>
+
+        <div class="card">
+            <h2>Query Parameters</h2>
+            <div class="meta-row"><span class="label">merchantAccount</span><span id="merchantAccount"></span></div>
+            <div class="meta-row"><span class="label">env</span><span id="env"></span></div>
+            <div class="meta-row"><span class="label">redirectResult</span><span id="redirectResult"></span></div>
+            <div class="meta-row"><span class="label">payload</span><span id="payload"></span></div>
+        </div>
+
+        <div class="card">
+            <h2>Action</h2>
+            <button id="submit-details">Submit /payments/details</button>
+            <div id="status" style="margin-top: 12px;"></div>
+        </div>
+
+        <div class="card">
+            <h2>Response</h2>
+            <pre id="responseArea">No response yet.</pre>
+        </div>
+    </div>
+
+    <script src="/redirect/redirect.js"></script>
+</body>
+</html>

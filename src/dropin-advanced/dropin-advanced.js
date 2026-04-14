@@ -106,6 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const value = parseInt(document.getElementById("amount")?.value || "5000", 10);
         const reference = document.getElementById("reference")?.value;
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
+        const billingAddressRequired = document.getElementById("billingAddressRequired")?.checked ? true : false;
         const dropBrowserInfo = document.getElementById("dropBrowserInfo")?.checked ? true : false;
         const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
         const storePaymentMethod = document.getElementById("storePaymentMethod")?.checked ? true : false;
@@ -145,7 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 brands : [ 'discover', 'visa', 'jcb' , 'mc' ],
                 hasHolderName: true,
                 showStoredPaymentMethods: true, 
-                enableStoreDetails: true
+                enableStoreDetails: true,
+                ...(billingAddressRequired && { billingAddressRequired })
                 //enableClickToPay: true,
                 //clickToPayConfiguration: {
                 //    merchantDisplayName : "Click To Pay Merchant Name",
