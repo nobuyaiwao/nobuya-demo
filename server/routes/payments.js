@@ -108,7 +108,6 @@ router.post("/storedPaymentMethods", async (req, res) => {
             return res.status(400).json({ error: "Missing shopperReference" });
         }
 
-        // Adyen GET に渡す query parameters
         const params = {
             merchantAccount: process.env.ADYEN_MERCHANT_ACCOUNT,
             shopperReference

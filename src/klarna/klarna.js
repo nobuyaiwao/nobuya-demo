@@ -20,24 +20,6 @@ const getQueryParam = (param) => {
     return urlParams.get(param);
 };
 
-//
-//const countryCode = document.getElementById("countryCode")?.value || "GB";
-//const telephoneNumber = document.getElementById("telephoneNumber")?.value || "+447755564318";
-//const currency = document.getElementById("currency")?.value || "GBP";
-//const value = parseInt(document.getElementById("amount")?.value || "2000", 10);
-//const reference = document.getElementById("reference")?.value;
-//const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
-//const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
-//const storePaymentMethod = document.getElementById("storePaymentMethod")?.checked ? true : false;
-//const origin = window.location.origin;
-//const klarnaOption = document.getElementById("klarnaOption")?.value || "klarna_paynow";
-//const shopperLocale = document.getElementById("shopperLocale")?.value || "en-GB";
-//const shopperReference = document.getElementById("shopperReference")?.value || "guest";
-//const shopperEmail = document.getElementById("shopperEmail")?.value || "customer@email.uk";
-//const shopperAddress = document.getElementById("shopperAddress")?.value || undefined;
-//const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
-//const challengeWindowSize = document.getElementById("challengeWindowSize")?.value || "02";
-
 // Function to initialize the Klarna Component
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("DOM fully loaded and parsed.");
@@ -137,10 +119,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 console.log("paymentMethodsResponse.paymentMethods:", paymentMethodsResponse.paymentMethods);
             }
             
-            const klarnaConfiguration = {
-                type: klarnaOption,
-                useKlarnaWidget: true // When set to true, the Klarna widget is shown. Set to false or leave the configuration object out to initiate a redirect flow.
-            };
+            //const klarnaConfiguration = {
+            //    type: klarnaOption,
+            //    useKlarnaWidget: true // When set to true, the Klarna widget is shown. Set to false or leave the configuration object out to initiate a redirect flow.
+            //};
+            const klarnaConfiguration = { type: "klarna_account", useKlarnaWidget: true };
 
             const configObj = {
                 paymentMethodsResponse,
@@ -150,7 +133,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 countryCode,
                 onChange: updateStateContainer,
                 onSubmit: async (state, component, actions) => {
-                    console.log('### card::onSubmit:: calling');
+                    console.log('### klarna::onSubmit:: calling');
+                    console.log('state.data:', state.data);
 
                     try {
                         document.getElementById("state-container").style.display = "none";
@@ -238,7 +222,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 },
                 onAdditionalDetails: async (state, component, actions) => {
-                    console.log("### card::onAdditionalDetails:: calling");
+                    console.log("### klarna::onAdditionalDetails:: calling");
 
                     try {
                         updatePaymentsLog("Details Request", state.data);
@@ -263,11 +247,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 },
                 onPaymentCompleted: async (result, component) => {
 
-                    console.log("### card::onPaymentCompleted:: calling");
+                    console.log("### klarna::onPaymentCompleted:: calling");
                     console.log(result);
 
-                    const cardContainer = document.getElementById("klarna-container");
-                    cardContainer.innerHTML = `
+                    const klarnaContainer = document.getElementById("klarna-container");
+                    klarnaContainer.innerHTML = `
                         <h2>Payment Result</h2>
                         <p><strong>Status:</strong> ${result.resultCode}</p>
                     `;
