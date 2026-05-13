@@ -269,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     }
                                 }
                             }),
-                            //recurringProcessingModel,
+                            recurringProcessingModel,
                             //...(state.data.paymentMethod?.storedPaymentMethodId && { shopperInteraction: "ContAuth" })
                             shopperInteraction: state.data.paymentMethod?.storedPaymentMethodId
                                 ? "ContAuth"
