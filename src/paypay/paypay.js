@@ -19,6 +19,51 @@ const getQueryParam = (param) => {
     return urlParams.get(param);
 };
 
+// 🔹 Handle redirection back to call /details
+document.addEventListener("DOMContentLoaded", async () => {
+    console.log("DOM fully loaded, processing redirect result...");
+
+    const redirectResult = getQueryParam("redirectResult");
+    if (!redirectResult) return;
+
+    console.log("Redirect result detected:", redirectResult);
+
+    // Hide input fields, button, and state-container
+    const inputContainer = document.querySelector(".input-container");
+    const startPaymentButton = document.getElementById("start-payment");
+    const stateContainer = document.getElementById("state-container");
+
+    if (inputContainer) inputContainer.style.display = "none";
+    if (startPaymentButton) startPaymentButton.style.display = "none";
+    if (stateContainer) stateContainer.style.display = "none";
+
+    const componentContainer = document.getElementById("paypay-container");
+    if (!componentContainer) {
+        console.error("component container not found in the DOM.");
+        return;
+    }
+
+    componentContainer.innerHTML = "<p>Processing your payment...</p>";
+
+    try {
+        // Call /payments/details with redirectResult
+        const detailsResult = await makeDetails({ details: { redirectResult } });
+
+        // Log details response in debug console
+        updatePaymentsLog("Details Response", detailsResult);
+
+        // Show final result in component container
+        componentContainer.innerHTML = `
+            <h2>Payment Result</h2>
+            <p><strong>Status:</strong> ${detailsResult.resultCode}</p>
+        `;
+
+        console.log("Details processed successfully:", detailsResult);
+    } catch (error) {
+        console.error("Error processing redirect result:", error);
+    }
+});
+
 // Function to initialize the Card Component
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("DOM fully loaded and parsed.");
@@ -129,96 +174,77 @@ document.addEventListener("DOMContentLoaded", async () => {
             //);
             //console.log("Click to Pay available:", isClickToPayAvailable);
 
-            // Card component configuration
-            const cardConfiguration = {
-                placeholders: {
-                    cardNumber: "0123 4567 8901 2345",
-                    expiryDate: "MM/YY",
-                    securityCodeThreeDigits: "123",
-                    holderName: "TARO YAMADA"
-                },
-                hasHolderName: true,
-                enableStoreDetails: true,
-                //hideCVC: true,
-                brands: ['discover', 'mc','visa'],
-                //clickToPayConfiguration: {
-                //    "merchantDisplayName" : "CTP Merchant Name",
-                //    shopperEmail
-                //},
-                styles: styleObject,
-                installmentOptions: {
-                    visa: {
-                        values: [ 1,3,6,9,12 ]
-                        //values: [ 2, 3, 5, 8, 10, 12, 15]
-                        //plans: [ 'regular', 'revolving' ]
-                        //plans: [ 'regular' ]
-                    },
-                },
-                challengeWindowSize,
-                onFieldValid: (cbObj) => {
-                    console.log("### card::onFieldValid:: calling:",cbObj);
-                },
-                onBinValue: (cbObj) => {
-                    console.log("### card::onBinValue:: calling:",cbObj);
-                },
-                onBrand: (cbObj) => {
-                    console.log("### card::onBrand:: calling:",cbObj);
-                },
-                onBinLookup: (cbObj) => {
-                    console.log("### card::onBinLookup:: calling:",cbObj);
-                } 
-            };
-            console.log("Card Configuration:", cardConfiguration);
+            //// Card component configuration
+            //const cardConfiguration = {
+            //    placeholders: {
+            //        cardNumber: "0123 4567 8901 2345",
+            //        expiryDate: "MM/YY",
+            //        securityCodeThreeDigits: "123",
+            //        holderName: "TARO YAMADA"
+            //    },
+            //    hasHolderName: true,
+            //    enableStoreDetails: true,
+            //    //hideCVC: true,
+            //    brands: ['discover', 'mc','visa'],
+            //    //clickToPayConfiguration: {
+            //    //    "merchantDisplayName" : "CTP Merchant Name",
+            //    //    shopperEmail
+            //    //},
+            //    styles: styleObject,
+            //    installmentOptions: {
+            //        visa: {
+            //            values: [ 1,3,6,9,12 ]
+            //            //values: [ 2, 3, 5, 8, 10, 12, 15]
+            //            //plans: [ 'regular', 'revolving' ]
+            //            //plans: [ 'regular' ]
+            //        },
+            //    },
+            //    challengeWindowSize,
+            //    onFieldValid: (cbObj) => {
+            //        console.log("### card::onFieldValid:: calling:",cbObj);
+            //    },
+            //    onBinValue: (cbObj) => {
+            //        console.log("### card::onBinValue:: calling:",cbObj);
+            //    },
+            //    onBrand: (cbObj) => {
+            //        console.log("### card::onBrand:: calling:",cbObj);
+            //    },
+            //    onBinLookup: (cbObj) => {
+            //        console.log("### card::onBinLookup:: calling:",cbObj);
+            //    } 
+            //};
+            //console.log("Card Configuration:", cardConfiguration);
 
-            const translations = {
-                "ja-JP": {
-                    "payButton": "このカードを登録",
-                    "form.instruction": ""
-                }
-            };
+            //const translations = {
+            //    "ja-JP": {
+            //        "payButton": "このカードを登録",
+            //        "form.instruction": ""
+            //    }
+            //};
 
             const configObj = {
                 paymentMethodsResponse,
                 clientKey: config.clientKey,
                 locale: "en-US",
                 //locale: "ja-JP",
-                translations,
+                //translations,
                 environment: config.environment,
                 countryCode,
 
-                // Risk Data Collecton
-                risk: {
-                    enabled: true,
-                    onComplete: (riskData) => {
-                        console.log("Adyen6 riskData ready", riskData)
-                    },
-                    onError: (error) => {
-                        console.error("Adyen6 riskData error", error)
-                    }
-                },
+                //// Risk Data Collecton
+                //risk: {
+                //    enabled: true,
+                //    onComplete: (riskData) => {
+                //        console.log("Adyen6 riskData ready", riskData)
+                //    },
+                //    onError: (error) => {
+                //        console.error("Adyen6 riskData error", error)
+                //    }
+                //},
 
                 onChange: updateStateContainer,
- /*
-                onChange: (state, component) => {
-                    updateStateContainer(state);
-                
-                    const holderName = state?.data?.paymentMethod?.holderName || "";
-                
-                    // ASCII（英数字と空白）のみ許容
-                    const isAsciiOnly = /^[\x00-\x7F]*$/.test(holderName);
-                
-                    if (!isAsciiOnly && holderName.length > 0) {
-                        // バリデーションエラーを手動で表示
-                        component.setStatus('invalid', { reason: 'holderName' });
-                        console.log("invalid character is used for holderName");
-                
-                        // フィールド自体に明示的なエラーメッセージを表示することは難しいが、
-                        // onSubmitをブロックするだけでもUXとして自然
-                    }
-                },
-*/
                 onSubmit: async (state, component, actions) => {
-                    console.log('### card::onSubmit:: calling');
+                    console.log('### paypay::onSubmit:: calling');
 
                     try {
                         document.getElementById("state-container").style.display = "none";
@@ -232,13 +258,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                             returnUrl,
                             origin,
                             channel: "Web",
-                            ...(nativeThreeDS && {
-                                authenticationData: {
-                                    threeDSRequestData: {
-                                        nativeThreeDS
-                                    }
-                                }
-                            }),
                             storePaymentMethod: true,
                             recurringProcessingModel
                         };
@@ -273,20 +292,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 },
                 onAdditionalDetails: async (state, component, actions) => {
-                    console.log("### card::onAdditionalDetails:: calling");
+                    console.log("### paypay::onAdditionalDetails:: calling");
                     //console.log(state.data.details.threeDSResult);
-                    const b64 = state.data.details.threeDSResult;
-                    
-                    try {
-                        const jsonString = atob(b64);
-                        const obj = JSON.parse(jsonString);
-                    
-                        console.log("threeDSResult (decoded, pretty):");
-                        console.log(JSON.stringify(obj, null, 2)); 
-                    
-                    } catch (e) {
-                        console.error("Decode error:", e);
-                    }
+
+                    //const b64 = state.data.details.threeDSResult;
+                    //try {
+                    //    const jsonString = atob(b64);
+                    //    const obj = JSON.parse(jsonString);
+                    //
+                    //    console.log("threeDSResult (decoded, pretty):");
+                    //    console.log(JSON.stringify(obj, null, 2)); 
+                    //
+                    //} catch (e) {
+                    //    console.error("Decode error:", e);
+                    //}
 
                     try {
                         updatePaymentsLog("Details Request", state.data);
@@ -302,7 +321,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const { resultCode, action } = result;
 
                         console.log("Handling additional details:", { resultCode, action });
-                        //actions.resolve({ resultCode });
                         actions.resolve({ resultCode, action });
                     } catch (error) {
                         console.error("Additional details processing error:", error);
@@ -311,7 +329,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 },
                 onPaymentCompleted: async (result, component) => {
 
-                    console.log("### card::onPaymentCompleted:: calling");
+                    console.log("### paypay::onPaymentCompleted:: calling");
                     console.log(result);
 
                     const cardContainer = document.getElementById("card-container");
@@ -323,36 +341,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             };
 
-            const { AdyenCheckout, Card } = window.AdyenWeb;
+            //const { AdyenCheckout, Card } = window.AdyenWeb;
+            const { AdyenCheckout, Redirect } = window.AdyenWeb;
             const checkout = await AdyenCheckout(configObj);
-            const card = new Card(checkout,cardConfiguration).mount("#card-container");
-            //const cardComponent = checkout.create("card", cardConfiguration);
-            //cardComponent.mount("#card-container");
-
-/*
-            let isComposing = false;
-
-            document.addEventListener("compositionstart", (event) => {
-              if (event.target.name === "holderName") {
-                isComposing = true;
-              }
-            });
-            
-            document.addEventListener("compositionend", (event) => {
-              if (event.target.name === "holderName") {
-                isComposing = false;
-                // 日本語入力が確定された場合も、即座に消す
-                event.target.value = event.target.value.replace(/[^a-zA-Z0-9\s]/g, '');
-              }
-            });
-            
-            document.addEventListener("input", function (event) {
-              if (event.target.name === "holderName" && !isComposing) {
-                event.target.value = event.target.value.replace(/[^a-zA-Z0-9\s]/g, '');
-              }
-            });
- */           
-
+            //const card = new Card(checkout,cardConfiguration).mount("#card-container");
+            const paypay = new Redirect(checkout, { type:'paypay' }).mount('#paypay-container')
 
         } catch (error) {
             console.error("Error during initialization:", error);
