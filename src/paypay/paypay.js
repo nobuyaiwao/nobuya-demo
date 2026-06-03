@@ -259,7 +259,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                             origin,
                             channel: "Web",
                             storePaymentMethod: true,
-                            recurringProcessingModel
+                            ...(recurringProcessingModel !== "NoRecurring" && {
+                                recurringProcessingModel
+                            })
                         };
 
                         updatePaymentsLog("Payment Request", paymentsReqData);
