@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (startPaymentButton) startPaymentButton.style.display = "none";
     if (stateContainer) stateContainer.style.display = "none";
 
-    const componentContainer = document.getElementById("paypay-container");
+    const componentContainer = document.getElementById("econtext-container");
     if (!componentContainer) {
         console.error("component container not found in the DOM.");
         return;
@@ -94,13 +94,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         const value = parseInt(document.getElementById("amount")?.value || "5000", 10);
         const reference = document.getElementById("reference")?.value;
         const returnUrl = document.getElementById("returnUrl")?.value || generateReturnUrl(reference);
-        const nativeThreeDS = document.getElementById("nativeThreeDS")?.checked ? "preferred" : undefined;
         const origin = window.location.origin;
         const shopperReference = document.getElementById("shopperReference")?.value || "guest";
         const shopperEmail = document.getElementById("shopperEmail")?.value || "test@example.com";
-        const storePaymentMethod = document.getElementById("storePaymentMethod")?.value || false;
-        const recurringProcessingModel = document.getElementById("recurringProcessingModel")?.value || "CardOnFile";
-        const challengeWindowSize = document.getElementById("challengeWindowSize")?.value || "02";
+        const econtextType = document.getElementById("econtextType")?.value || "econtext_store";
 
         if (isNaN(value) || value < 0) {
             console.error("Invalid amount value. Please enter a valid number.");
@@ -125,10 +122,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             const scheme = paymentMethodsResponse.paymentMethods
                 .find(pm => pm.type === 'scheme');
-            
-            //if (scheme) {
-            //    scheme.brands = ['visa', 'mc'];
-            //}
 
             if (!paymentMethodsResponse) throw new Error("Failed to load payment methods");
 
@@ -141,18 +134,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Define style object
             var styleObject = {
-              //base: {
-              //  color: '#000',
-              //  background: '#ccffe5', 
-              //  boxShadow: '0 4px 0 0 #007bff',
-              //  paddingBottom: '8px'
-              //},
-              //focus: {
-              //  boxShadow: '0 4px 0 0 #00bcd4'
-              //},
-              //error: {
-              //  boxShadow: '0 4px 0 0 red'
-              //},
               base: {
                 color: "black",
                 fontSize: "14px",
@@ -168,60 +149,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 fontSize: "14px"
               }
             };
-            
-            //// Click To Pay Availability Check
-            //const isClickToPayAvailable = paymentMethodsResponse.paymentMethods?.some(
-            //    pm => pm.type === "scheme" && pm.clickToPay
-            //);
-            //console.log("Click to Pay available:", isClickToPayAvailable);
 
-            //// Card component configuration
-            //const cardConfiguration = {
-            //    placeholders: {
-            //        cardNumber: "0123 4567 8901 2345",
-            //        expiryDate: "MM/YY",
-            //        securityCodeThreeDigits: "123",
-            //        holderName: "TARO YAMADA"
-            //    },
-            //    hasHolderName: true,
-            //    enableStoreDetails: true,
-            //    //hideCVC: true,
-            //    brands: ['discover', 'mc','visa'],
-            //    //clickToPayConfiguration: {
-            //    //    "merchantDisplayName" : "CTP Merchant Name",
-            //    //    shopperEmail
-            //    //},
-            //    styles: styleObject,
-            //    installmentOptions: {
-            //        visa: {
-            //            values: [ 1,3,6,9,12 ]
-            //            //values: [ 2, 3, 5, 8, 10, 12, 15]
-            //            //plans: [ 'regular', 'revolving' ]
-            //            //plans: [ 'regular' ]
-            //        },
-            //    },
-            //    challengeWindowSize,
-            //    onFieldValid: (cbObj) => {
-            //        console.log("### card::onFieldValid:: calling:",cbObj);
-            //    },
-            //    onBinValue: (cbObj) => {
-            //        console.log("### card::onBinValue:: calling:",cbObj);
-            //    },
-            //    onBrand: (cbObj) => {
-            //        console.log("### card::onBrand:: calling:",cbObj);
-            //    },
-            //    onBinLookup: (cbObj) => {
-            //        console.log("### card::onBinLookup:: calling:",cbObj);
-            //    } 
-            //};
-            //console.log("Card Configuration:", cardConfiguration);
-
-            //const translations = {
-            //    "ja-JP": {
-            //        "payButton": "このカードを登録",
-            //        "form.instruction": ""
-            //    }
-            //};
+            const econtextConfiguration = {
+                personalDetailsRequired: true
+            };
 
             const configObj = {
                 paymentMethodsResponse,
@@ -232,20 +163,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 environment: config.environment,
                 countryCode,
 
-                //// Risk Data Collecton
-                //risk: {
-                //    enabled: true,
-                //    onComplete: (riskData) => {
-                //        console.log("Adyen6 riskData ready", riskData)
-                //    },
-                //    onError: (error) => {
-                //        console.error("Adyen6 riskData error", error)
-                //    }
-                //},
-
                 onChange: updateStateContainer,
                 onSubmit: async (state, component, actions) => {
-                    console.log('### paypay::onSubmit:: calling');
+                    console.log('### econtext::onSubmit:: calling');
 
                     try {
                         document.getElementById("state-container").style.display = "none";
@@ -258,11 +178,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             shopperEmail,
                             returnUrl,
                             origin,
-                            channel: "Web",
-                            storePaymentMethod,
-                            ...(recurringProcessingModel !== "NoRecurring" && {
-                                recurringProcessingModel
-                            })
+                            channel: "Web"
                         };
 
                         updatePaymentsLog("Payment Request", paymentsReqData);
@@ -295,20 +211,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 },
                 onAdditionalDetails: async (state, component, actions) => {
-                    console.log("### paypay::onAdditionalDetails:: calling");
-                    //console.log(state.data.details.threeDSResult);
-
-                    //const b64 = state.data.details.threeDSResult;
-                    //try {
-                    //    const jsonString = atob(b64);
-                    //    const obj = JSON.parse(jsonString);
-                    //
-                    //    console.log("threeDSResult (decoded, pretty):");
-                    //    console.log(JSON.stringify(obj, null, 2)); 
-                    //
-                    //} catch (e) {
-                    //    console.error("Decode error:", e);
-                    //}
+                    console.log("### econtext::onAdditionalDetails:: calling");
 
                     try {
                         updatePaymentsLog("Details Request", state.data);
@@ -332,7 +235,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 },
                 onPaymentCompleted: async (result, component) => {
 
-                    console.log("### paypay::onPaymentCompleted:: calling");
+                    console.log("### econtext::onPaymentCompleted:: calling");
                     console.log(result);
 
                     const cardContainer = document.getElementById("card-container");
@@ -345,10 +248,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             };
 
             //const { AdyenCheckout, Card } = window.AdyenWeb;
-            const { AdyenCheckout, Redirect } = window.AdyenWeb;
+            const { AdyenCheckout, Econtext } = window.AdyenWeb;
             const checkout = await AdyenCheckout(configObj);
             //const card = new Card(checkout,cardConfiguration).mount("#card-container");
-            const paypay = new Redirect(checkout, { type:'paypay' }).mount('#paypay-container')
+            const econtext = new Econtext(checkout,{ type : econtextType }).mount('#econtext-container')
 
         } catch (error) {
             console.error("Error during initialization:", error);

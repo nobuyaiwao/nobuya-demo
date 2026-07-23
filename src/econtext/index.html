@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PayPay Component (Advanced Flow)</title>
+    <title>Econtext Component (Advanced Flow)</title>
     <!--script src="https://checkoutshopper-live.cdn.adyen.com/checkoutshopper/sdk/6.8.0/adyen.js"
      integrity="sha384-bxVQwK8MZv5Nf5/TghsCZJ23F+FnlBAKG/6/8XE4SIThMQVLWys04oJ/HhJ+bXKD"
      crossorigin="anonymous"></script>
@@ -24,7 +24,7 @@
 <body>
     <div class="container">
         <div class="left-panel">
-            <h1>PayPay Component (Advanced Flow)</h1>
+            <h1>Econtext Component (Advanced Flow)</h1>
             <div class="input-container">
                 <label for="countryCode">Country Code</label>
                 <input type="text" id="countryCode" value="JP">
@@ -41,13 +41,22 @@
                 <label for="returnUrl">Return URL</label>
                 <input type="text" id="returnUrl" placeholder="Generating..." value="">
 
+                <label for="econtextType">Econtext Payment Method Type:</label>
+                <select id="econtextType">
+                    <option value="econtext_stores" selected>Konbini</option>
+                    <option value="econtext_seven_eleven" >Konbini - Seven Eleven</option>
+                    <option value="econtext_online" >Online Banking</option>
+                    <option value="econtext_atm">ATM</option>
+                </select>
+
+<!--
+
                 <label for="storePaymentMethod">Store Payment Method</label>
                 <label class="switch">
                     <input type="checkbox" id="storePaymentMethod">
                     <span class="slider round"></span>
                 </label>
 
-<!--
                 <label for="nativeThreeDS">Enable 3DS Native</label>
                 <label class="switch">
                     <input type="checkbox" id="nativeThreeDS" checked>
@@ -60,6 +69,7 @@
                     <input type="text" id="shopperReference" value="nobuya-demo-user" placeholder="Enter shopper ID">
                     <label for="shopperEmail">Shopper e-mail:</label>
                     <input type="text" id="shopperEmail" value="" placeholder="Enter shopper e-mail">
+<!--
                     <label for="recurringProcessingModel">Recurring Model:</label>
                     <select id="recurringProcessingModel">
                         <option value="NoRecurring" selected>No Recurring Payments</option>
@@ -67,7 +77,6 @@
                         <option value="Subscription" >Subscription</option>
                         <option value="UnscheduledCardOnFile">Unscheduled Card On File</option>
                     </select>
-<!--
                     <label for="challengeWindowSize">Challenge Window Size:</label>
                     <select id="challengeWindowSize">
                         <option value="01">'01': ['250px', '400px']</option>
@@ -84,7 +93,7 @@
             <!--div class="card-wrapper">
               <div id="card-container" tabindex="-1"></div>
             </div-->
-            <div id="paypay-container"></div>
+            <div id="econtext-container"></div>
 
             <div class="button-group">
                 <button onclick="window.location.href='../index.html'">Go Back</button>
@@ -97,7 +106,7 @@
             <h2>Debug Console</h2>
 
             <!-- 🔹 Test Cards Section -->
-            <div id="test-cards-container"></div>
+            <!div id="test-cards-container"><!/div>
 
             <!-- 🔹 Debug Sections -->
             <div class="debug-section">
@@ -112,7 +121,7 @@
     </div>
 
     <script src="/test-cards.js"></script>
-    <script type="module" src="./paypay.js"></script>
+    <script type="module" src="./econtext.js"></script>
 </body>
 </html>
 

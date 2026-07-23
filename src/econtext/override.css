@@ -1,0 +1,30 @@
+/*
+:root {
+    --adyen-sdk-color-background-secondary: #ffffff;
+    --adyen-sdk-border-radius-xs: 20px;
+    --adyen-sdk-border-radius-s: 40px;
+    --adyen-sdk-border-radius-m: 80px;
+    --adyen-sdk-border-radius-l: 120px;
+    --adyen-sdk-border-radius-xl: 240px;
+    --adyen-sdk-border-bottom: 1px dotted gray;
+}
+*/
+.adyen-checkout__input-wrapper {
+/*
+  background: red;
+  background: #ccffe5; 
+  border-bottom: 1px dashed red !important;
+  border: 0.125rem solid green;
+  border: 0.125rem solid #c0c0c0;
+  border-radius: 1rem;
+  --adyen-sdk-color-outline-primary-active: red;
+*/
+}
+
+/*
+.adyen-checkout__input-wrapper:focus-within {
+  border: 2px solid blue !important;
+  background-color: red;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.6);
+}
+*/

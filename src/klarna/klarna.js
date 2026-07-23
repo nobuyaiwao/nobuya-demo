@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             //    type: klarnaOption,
             //    useKlarnaWidget: true // When set to true, the Klarna widget is shown. Set to false or leave the configuration object out to initiate a redirect flow.
             //};
-            const klarnaConfiguration = { type: "klarna_account", useKlarnaWidget: true };
+            const klarnaConfiguration = { type: klarnaOption, useKlarnaWidget: true };
 
             const configObj = {
                 paymentMethodsResponse,
